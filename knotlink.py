@@ -1,161 +1,176 @@
-import React, { useState } from 'react';
-import { X, User, Bell, Calendar, Star, MessageSquare, Heart, Share2, MoreHorizontal } from 'lucide-react';
+import streamlit as st
+import pandas as pd
+from datetime import datetime
 
-const INITIAL_POSTS = [
-  {
-    id: 1,
-    author: "Weh-nah-noo",
-    authorLevel: 15,
-    title: "[Post] Did y'all hear? Porcelumex's CEO just got the boot!",
-    content: "Heard Porcelumex's CEO Ferox got taken down. Anyone know if this is legit or just rumors?",
-    img: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=800",
-    category: "General",
-    likes: 42,
-    comments: [
-      { id: 101, user: "Chop Chop", floor: "1F", text: "Who? Why should we give a Denny about any of this?", avatar: "🦊" },
-      { id: 102, user: "Anonymous", floor: "2F", text: "I don't know what's going on, but something must be happening in the Waifei Peninsula. Several TOPS higher-ups have been canceling their events lately, and they're all staying put in Waifei Peninsula — not a single one has left. This whole situation is definitely fishy.", avatar: "👤" },
-      { id: 103, user: "Beardy", floor: "3F", text: "Now that he's out of the picture, what about Lucro?", avatar: "🧔" }
+# --- SETTINGS & CONFIG ---
+st.set_page_config(
+    page_title="INTER-KNOT // Proxy Network",
+    page_icon="🔌",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# --- CUSTOM CSS FOR INTER-KNOT AESTHETIC ---
+st.markdown("""
+    <style>
+    /* Main Background and Text */
+    .stApp {
+        background-color: #0a0a0a;
+        color: #e0e0e0;
+    }
+    
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background-color: #0d0d0d;
+        border-right: 1px solid #333;
+    }
+
+    /* Post Card Styling */
+    .knot-card {
+        background-color: #151515;
+        border-left: 4px solid #ff6b00;
+        padding: 20px;
+        border-radius: 0px 10px 10px 0px;
+        margin-bottom: 20px;
+        transition: transform 0.2s;
+    }
+    .knot-card:hover {
+        transform: translateX(5px);
+        background-color: #1a1a1a;
+    }
+
+    /* Typography */
+    h1, h2, h3 {
+        font-family: 'Courier New', Courier, monospace;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    
+    .proxy-tag {
+        color: #ff6b00;
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+    
+    .status-badge {
+        background-color: #333;
+        color: #888;
+        padding: 2px 8px;
+        font-size: 0.7rem;
+        border-radius: 4px;
+        text-transform: uppercase;
+    }
+    </style>
+    """, unsafe_allow_headers=True)
+
+# --- SESSION STATE (MOCK DATABASE) ---
+if 'posts' not in st.session_state:
+    st.session_state.posts = [
+        {
+            "id": 1,
+            "author": "Weh-nah-noo",
+            "title": "[Post] Did y'all hear? Porcelumex's CEO just got the boot!",
+            "content": "Heard Porcelumex's CEO Ferox got taken down. Anyone know if this is legit or just rumors?",
+            "time": "2024-05-20 14:30",
+            "likes": 42,
+            "category": "General"
+        },
+        {
+            "id": 2,
+            "author": "MetisIntelligence",
+            "title": "[News] Federal Reserve signals potential rate cut in Q3",
+            "content": "In a surprising move, the Federal Reserve Chair indicated that inflation targets are nearing the 2% threshold.",
+            "time": "2024-05-20 15:45",
+            "likes": 128,
+            "category": "General"
+        }
     ]
-  },
-  {
-    id: 2,
-    author: "MetisIntelligence",
-    authorLevel: 42,
-    title: "[News] Federal Reserve signals potential rate cut in Q3",
-    content: "In a surprising move, the Federal Reserve Chair indicated that inflation targets are nearing the 2% threshold, suggesting a shift in monetary policy.",
-    img: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?q=80&w=800",
-    category: "General",
-    likes: 128,
-    comments: []
-  }
-];
 
-const App = () => {
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [filter, setFilter] = useState('All');
+# --- SIDEBAR NAVIGATION ---
+with st.sidebar:
+    st.markdown("<h1 style='color: #ff6b00;'>INTER-KNOT</h1>", unsafe_allow_headers=True)
+    st.caption("v4.0.5-STABLE // Node: New Eridu")
+    
+    st.divider()
+    
+    menu = st.radio(
+        "NETWORK NAVIGATION",
+        ["Lounge (Feed)", "Intel Sharing", "Profile"],
+        index=0
+    )
+    
+    st.divider()
+    st.markdown("### 👤 PROXY_INFO")
+    st.markdown("**ID:** PHAETHON")
+    st.markdown("**RANK:** <span style='color:#3b82f6'>Legendary (LV.60)</span>", unsafe_allow_headers=True)
+    
+    if st.button("🔄 REFRESH SYNC"):
+        st.rerun()
 
-  return (
-    <div className="min-h-screen bg-[#0d0d0d] text-[#e0e0e0] font-sans">
-      {/* Top Header */}
-      <header className="flex items-center justify-between px-6 py-4 bg-[#121212] border-b border-white/5 sticky top-0 z-50">
-        <div className="flex items-center gap-4">
-          <div className="bg-[#1a1a1a] rounded-full px-3 py-1 flex items-center gap-2 border border-white/10">
-            <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-[10px] font-bold">P</div>
-            <div className="text-[10px] font-bold">LV.60</div>
-          </div>
-        </div>
-        <div className="flex gap-4">
-           <button className="bg-[#ff4d4d] text-white px-6 py-1.5 rounded-md text-xs font-bold uppercase transition-transform active:scale-95">All</button>
-           <button className="bg-[#1a1a1a] text-white/50 px-6 py-1.5 rounded-md text-xs font-bold uppercase hover:text-white">General</button>
-           <button className="bg-[#1a1a1a] text-white/50 px-6 py-1.5 rounded-md text-xs font-bold uppercase hover:text-white">Help Info</button>
-        </div>
-      </header>
+# --- APP LOGIC ---
 
-      {/* Main Feed */}
-      <main className="max-w-4xl mx-auto p-6 space-y-6">
-        {INITIAL_POSTS.map(post => (
-          <div key={post.id} className="bg-[#151515] rounded-2xl border border-white/5 overflow-hidden transition-all hover:border-white/10">
-            <div className="flex flex-col md:flex-row">
-              <div className="md:w-1/3 aspect-video md:aspect-square overflow-hidden relative">
-                <img src={post.img} className="w-full h-full object-cover opacity-80" alt="" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              </div>
-              <div className="p-6 flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-4 h-4 rounded-full bg-white/20" />
-                    <span className="text-[10px] text-white/40 font-bold uppercase tracking-wider">{post.author}</span>
-                  </div>
-                  <h2 className="text-lg font-bold leading-snug mb-2">{post.title}</h2>
-                  <p className="text-sm text-white/50 line-clamp-2 leading-relaxed">{post.content}</p>
-                </div>
-                <button 
-                  onClick={() => setSelectedPost(post)}
-                  className="mt-6 w-full py-2 bg-[#1a1c23] hover:bg-[#252833] border border-white/5 rounded-lg text-xs font-bold tracking-widest text-blue-400 uppercase transition-all"
-                >
-                  Read Report #{post.id}
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </main>
-
-      {/* Thread Detail Overlay */}
-      {selectedPost && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setSelectedPost(null)} />
-          
-          <div className="relative w-full max-w-4xl bg-[#111] rounded-3xl border border-white/10 flex flex-col md:flex-row overflow-hidden shadow-2xl h-[80vh]">
+if menu == "Lounge (Feed)":
+    st.markdown("## // THE PROXY LOUNGE")
+    
+    # NEW POST SECTION
+    with st.expander("➕ CREATE NEW ENCRYPTED BROADCAST"):
+        with st.form("new_post_form", clear_on_submit=True):
+            title = st.text_input("Thread Title")
+            content = st.text_area("Intel Content")
+            submit = st.form_submit_button("CONFIRM BROADCAST")
             
-            {/* Thread Content */}
-            <div className="flex-1 overflow-y-auto p-8 border-r border-white/5 custom-scrollbar">
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-xl border-2 border-white/10">🐷</div>
-                  <div>
-                    <div className="text-sm font-bold">{selectedPost.author}</div>
-                    <div className="bg-zinc-800 px-2 py-0.5 rounded text-[8px] font-black w-fit mt-1 flex items-center gap-1">
-                      <Heart size={8} fill="currentColor" /> {selectedPost.authorLevel}
+            if submit and title and content:
+                new_entry = {
+                    "id": len(st.session_state.posts) + 1,
+                    "author": "PHAETHON",
+                    "title": title,
+                    "content": content,
+                    "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                    "likes": 0,
+                    "category": "General"
+                }
+                st.session_state.posts.insert(0, new_entry)
+                st.success("Thread synchronized with Inter-Knot.")
+                st.rerun()
+
+    # FILTER SEARCH
+    search = st.text_input("🔍 Search network threads...", "")
+
+    # DISPLAY POSTS
+    for post in st.session_state.posts:
+        if search.lower() in post['title'].lower() or search.lower() in post['content'].lower():
+            st.markdown(f"""
+                <div class="knot-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="proxy-tag">@{post['author']}</span>
+                        <span class="status-badge">#{post['id']:03d}</span>
                     </div>
-                  </div>
-                </div>
-                <button onClick={() => setSelectedPost(null)} className="p-2 bg-[#ff3b3b] rounded-xl text-black hover:scale-110 transition-transform">
-                  <X size={20} strokeWidth={3} />
-                </button>
-              </div>
-
-              <div className="space-y-6">
-                <div className="rounded-2xl overflow-hidden border border-white/5 aspect-video bg-black">
-                   <img src={selectedPost.img} className="w-full h-full object-cover" alt="" />
-                </div>
-                <h2 className="text-2xl font-black">{selectedPost.title}</h2>
-                <p className="text-white/70 leading-relaxed text-sm whitespace-pre-wrap">{selectedPost.content}</p>
-              </div>
-            </div>
-
-            {/* Comments Sidebar (Matching the image) */}
-            <div className="w-full md:w-[350px] bg-[#0c0c0c] flex flex-col">
-              <div className="p-4 border-b border-white/5 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
-                Comments & Replies
-              </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {selectedPost.comments.map(comment => (
-                  <div key={comment.id} className="relative group">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#1a1a1a] flex items-center justify-center text-sm border border-white/5">
-                        {comment.avatar}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] font-bold text-white/80">{comment.user}</span>
-                          <span className="text-[8px] font-black bg-white/5 px-1.5 py-0.5 rounded text-white/40">{comment.floor}</span>
-                        </div>
-                        <p className="text-[11px] text-white/60 leading-normal">{comment.text}</p>
-                      </div>
+                    <h3 style="margin-top: 10px;">{post['title']}</h3>
+                    <p style="font-size: 0.9rem; color: #aaa;">{post['content']}</p>
+                    <div style="margin-top: 15px; display: flex; gap: 20px; font-size: 0.7rem; color: #555;">
+                        <span>📅 {post['time']}</span>
+                        <span>❤️ {post['likes']} LIKES</span>
+                        <span style="color: #ff6b00;">[ACCESS_DATA]</span>
                     </div>
-                    <div className="h-[1px] w-full bg-white/5 mt-4" />
-                  </div>
-                ))}
-              </div>
-              <div className="p-4 bg-[#141414] border-t border-white/5">
-                <div className="flex items-center gap-2 text-[10px] font-bold text-blue-400 animate-pulse">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                  Live Sync Active
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+            """, unsafe_allow_headers=True)
 
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-      `}</style>
-    </div>
-  );
-};
+elif menu == "Intel Sharing":
+    st.markdown("## // INTEL SHARING")
+    st.info("Searching for high-value Hollow commissions...")
+    st.image("https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800", caption="Encrypted Data Stream")
+    st.warning("Warning: Connection to Outpost 01 is currently unstable.")
 
-export default App;
+elif menu == "Profile":
+    st.markdown("## // PROXY PROFILE: PHAETHON")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Inter-Knot Credits", "45,200", "+1,200")
+        st.metric("Successful Commissions", "142")
+    with col2:
+        st.metric("Trust Level", "MAX", "Fairy Sync: 99%")
+        st.metric("Hollow Zero Keys", "3")
+
+# --- FOOTER ---
+st.markdown("---")
+st.caption("Unauthorized access to Inter-Knot is punishable by H.A.N.D. regulation. Stay safe, Proxy.")
