@@ -1,245 +1,262 @@
 import React, { useState, useEffect } from 'react';
-import { X, ChevronRight, User, Bell, LayoutGrid } from 'lucide-react';
+import { X, ChevronRight, User, Bell, LayoutGrid, Flame, TrendingUp, MessageSquare, ShieldAlert } from 'lucide-react';
+
+const TRENDING_TOPICS = [
+  { id: 1, title: "Trump issues warning to Iran", sub: "Trump Vows To Strike Civilian Infrastructure...", tag: "r/politics", img: "https://images.unsplash.com/photo-1580130281216-33b47f4528e2?q=80&w=800" },
+  { id: 2, title: "US rescues missing pilot", sub: "U.S. forces rescue second crew member...", tag: "r/worldnews", img: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?q=80&w=800" },
+  { id: 3, title: "New Artemis II photos", sub: "New image from NASA: For the first tim...", tag: "r/spaceporn", img: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=800" },
+  { id: 4, title: "Pepsi pulls out of Wi...", sub: "Pepsi Cancels Sponsorship c...", tag: "r/Music", img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800" }
+];
 
 const INITIAL_POSTS = [
   {
-    id: 1,
-    author: "MetisIntelligence",
-    title: "[Post] Vision's shocking scandal exposed — Perlman is going to jail!",
-    preview: "Charles Perlman, chief executive of Vision Corp, has been indicted...",
-    content: "Charles Perlman, chief executive of Vision Corp, has been indicted on multiple counts of fraud and money laundering following a whistle-blower report. The investigation reveals a massive cover-up involving the new Eridu energy sector.",
-    img: "https://images.unsplash.com/photo-1585829365234-781fdb509147?q=80&w=800",
+    id: 101,
+    author: "Obsidian Blade",
+    likes: 3960,
+    title: "[Commission] Obsidian: Strategic Eradication",
+    preview: "Hollow activity has drastically diminished. Maximum alert level has now been temporarily lifted!",
+    content: "I am the captain of a mercenary troupe hired by Obsidian Division. Hollow activity has crossed the warning threshold, and Obsidian Division have adopted the most extreme suppression program: Indiscriminate extermination of all living things inside the Hollow...",
+    img: "https://images.unsplash.com/photo-1614728263952-84ea206f99b6?q=80&w=800",
     category: "General",
     replies: [
-      { user: "Proxy_X", text: "Finally, justice for the workers.", floor: "1F" },
-      { user: "Anon99", text: "I bet he has a backup plan. Vision is too big to fall.", floor: "2F" }
+      { user: "Kitty_Freak", text: "That's terrifying... I'm keeping well away from the Hollows for now!", floor: "1F" },
+      { user: "Fantastical_Balut", text: "There's no room for argument with Obsidian Division... *sigh*", floor: "2F" },
+      { user: "Doomed_Once_Daily", text: "Doesn't really sound as though OP has any choice...", floor: "3F" }
     ]
   },
   {
-    id: 2,
-    author: "Worrybot",
-    title: "A new Hollow on Fourteenth Street!",
-    preview: "A Companion Hollow has appeared near the old subway entrance...",
-    content: "Observers report a sudden surge in Ether activity near the old subway entrance. Residents are advised to evacuate immediately. Public security has cordoned off the area.",
-    img: "https://images.unsplash.com/photo-1478720143022-10dca8de9cc1?q=80&w=800",
+    id: 102,
+    author: "Weh-nah-noo",
+    likes: 15,
+    title: "[Post] Did y'all hear? Porcelumex's CEO just got the boot!",
+    preview: "Heard Porcelumex's CEO Ferox got taken down. Anyone know if this is legit?",
+    content: "Heard Porcelumex's CEO Ferox got taken down. Anyone know if this is legit or just rumors? Something must be happening in the Waifei Peninsula. Several TOPS higher-ups have been canceling events lately.",
+    img: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=800",
     category: "General",
     replies: [
-      { user: "Cpt_Safety", text: "Avoid the area at all costs. The corruption levels are peaking.", floor: "1F" }
+      { user: "Chop Chop", text: "Who? Why should we give a Denny about any of this?", floor: "1F" },
+      { user: "Anonymous", text: "The whole situation is definitely fishy. Not a single one has left the peninsula.", floor: "2F" }
     ]
   },
   {
-    id: 3,
-    author: "Friend2Proxy",
-    title: "[Info] Proxy Must-Knows: Carrots",
-    preview: "Investigators and Proxies often discuss 'Carrots'...",
-    content: "Did you know that 'Carrots' aren't just for eating? In the Hollows, they refer to specialized navigational lures. Using them correctly can mean the difference between getting out or getting lost forever.",
-    img: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?q=80&w=800",
-    category: "Help Request Info",
+    id: 103,
+    author: "Reuters_Global",
+    likes: 820,
+    title: "[News] Federal Reserve signals potential rate cut in Q3",
+    preview: "In a surprising move, the Federal Reserve Chair indicated that inflation targets are nearing...",
+    content: "In a surprising move, the Federal Reserve Chair indicated that inflation targets are nearing the 2% threshold, suggesting a shift in monetary policy to support labor market stability.",
+    img: "https://images.unsplash.com/photo-1611974714158-f89644d67c1e?q=80&w=800",
+    category: "Help Info",
     replies: []
-  },
-  {
-    id: 4,
-    author: "gawadaw",
-    title: "[Question] How to quickly level up your IK account?",
-    preview: "I've been stuck at Level 30 for weeks. Any high-yield commissions?",
-    content: "I've been stuck at Level 30 for weeks. Any high-yield commissions I should look out for? I really want to unlock the high-tier tuning materials.",
-    img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800",
-    category: "Help Request Info",
-    replies: [
-      { user: "IK_Master", text: "Focus on the daily login challenges and priority 'General' posts.", floor: "1F" }
-    ]
   }
 ];
 
 const App = () => {
   const [filter, setFilter] = useState('All');
   const [selectedPost, setSelectedPost] = useState(null);
-  const [posts] = useState(INITIAL_POSTS);
 
-  const filteredPosts = posts.filter(post => 
+  const filteredPosts = INITIAL_POSTS.filter(post => 
     filter === 'All' || post.category === filter
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white font-mono selection:bg-yellow-400 selection:text-black">
+    <div className="min-h-screen bg-[#080808] text-zinc-100 font-sans selection:bg-yellow-400 selection:text-black">
       {/* Top Header */}
-      <header className="flex items-center justify-between px-6 py-4 bg-black/40 backdrop-blur-md sticky top-0 z-40 border-b border-white/5">
+      <header className="flex items-center justify-between px-8 py-4 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-50 border-b border-white/5">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3 bg-[#1a1a1a] rounded-full px-4 py-2 border border-white/10">
-             <div className="w-8 h-8 rounded-full bg-zinc-700 overflow-hidden flex items-center justify-center border border-white/20">
-                <User size={20} className="text-zinc-400" />
+          <div className="flex items-center gap-3 bg-[#1a1a1a] rounded-xl px-4 py-2 border border-white/10">
+             <div className="w-9 h-9 rounded-full bg-zinc-800 flex items-center justify-center border border-white/10 shadow-inner">
+                <User size={20} className="text-zinc-500" />
              </div>
-             <div className="pr-2">
-                <div className="text-xs text-white/90 font-bold leading-tight tracking-wider uppercase">Anonymous User</div>
-                <div className="text-[9px] text-white/30 leading-tight uppercase tracking-widest">Identity Hidden</div>
+             <div>
+                <div className="text-sm font-black tracking-tight text-white uppercase italic">Anonymous User</div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                  <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Status: Hidden</div>
+                </div>
              </div>
           </div>
         </div>
 
-        <nav className="flex items-center gap-1">
-          <button className="flex items-center gap-2 px-6 py-2 rounded-full bg-yellow-400 text-black font-bold text-sm">
-            <Bell size={16} /> Notifications
+        <nav className="flex items-center gap-4">
+          <button className="flex items-center gap-2 px-5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 transition-all border border-white/5 font-bold text-xs uppercase tracking-widest">
+            <Bell size={14} className="text-yellow-400" /> Notifications
           </button>
-          <button className="flex items-center gap-2 px-6 py-2 rounded-full hover:bg-white/5 transition-colors text-sm font-bold">
-            <LayoutGrid size={16} /> Intel Board
+          <button className="flex items-center gap-2 px-5 py-2 rounded-xl bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-yellow-400 transition-colors">
+            <LayoutGrid size={14} /> Intel Board
           </button>
         </nav>
       </header>
 
-      {/* Sub-navigation Filters */}
-      <div className="max-w-7xl mx-auto px-6 py-6 flex justify-end gap-2">
-        {['All', 'General', 'Help Request Info'].map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setFilter(cat)}
-            className={`px-8 py-1 rounded-full text-xs font-bold transition-all ${
-              filter === cat
-                ? 'bg-yellow-400 text-black'
-                : 'bg-[#1a1a1a] text-white/60 hover:bg-[#2a2a2a]'
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+      <main className="max-w-[1600px] mx-auto px-8 py-8">
+        {/* Trending Section (from your first image) */}
+        <section className="mb-12">
+          <div className="flex items-center gap-2 mb-6 ml-2">
+            <Flame size={20} className="text-orange-500" />
+            <h2 className="text-lg font-black italic uppercase tracking-tighter">Hot Intel</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {TRENDING_TOPICS.map((topic) => (
+              <div 
+                key={topic.id} 
+                className="group relative h-48 rounded-2xl overflow-hidden cursor-pointer border border-white/5 hover:border-yellow-400/50 transition-all shadow-2xl"
+              >
+                <img src={topic.img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 p-4 w-full">
+                  <h3 className="font-bold text-sm leading-tight mb-1 group-hover:text-yellow-400 transition-colors">{topic.title}</h3>
+                  <p className="text-[10px] text-zinc-400 line-clamp-1 mb-2">{topic.sub}</p>
+                  <div className="flex items-center gap-1.5 opacity-80">
+                    <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center">
+                      <TrendingUp size={10} />
+                    </div>
+                    <span className="text-[10px] font-bold text-white/60">{topic.tag}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      {/* Grid Feed */}
-      <main className="max-w-7xl mx-auto px-6 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {/* Filter Navigation */}
+        <div className="flex justify-center gap-3 mb-8">
+          {['All', 'General', 'Help Info'].map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setFilter(cat)}
+              className={`px-12 py-2 rounded-lg text-xs font-black transition-all italic tracking-widest border ${
+                filter === cat
+                  ? 'bg-red-500 border-red-400 text-white shadow-[0_0_20px_rgba(239,68,68,0.3)]'
+                  : 'bg-[#151515] border-white/5 text-zinc-500 hover:text-white hover:bg-zinc-800'
+              }`}
+            >
+              {cat.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        {/* Post Grid (Obsidian style) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPosts.map((post) => (
             <div
               key={post.id}
               onClick={() => setSelectedPost(post)}
-              className="group relative bg-[#151515] rounded-2xl overflow-hidden border-2 border-transparent hover:border-yellow-400 transition-all cursor-pointer flex flex-col h-[380px]"
+              className="bg-[#121212] rounded-3xl border border-white/5 hover:border-yellow-400/30 transition-all p-5 cursor-pointer group shadow-xl"
             >
-              {/* Background Image Layer */}
-              <div 
-                className="h-48 w-full bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-500"
-                style={{ backgroundImage: `url(${post.img})` }}
-              />
-              
-              {/* Content Layer */}
-              <div className="p-4 flex flex-col flex-grow bg-gradient-to-t from-[#111] via-[#151515] to-transparent">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 rounded-full bg-[#333] flex items-center justify-center text-[10px] border border-white/10">
-                    <User size={12} />
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center border border-white/5">
+                    <User size={16} className="text-zinc-500" />
                   </div>
-                  <span className="text-[10px] font-bold text-white/70 uppercase tracking-tighter truncate">
-                    {post.author}
-                  </span>
+                  <div>
+                    <div className="text-xs font-bold text-white/90">{post.author}</div>
+                    <div className="text-[10px] text-zinc-500 italic">#{post.likes} Merit</div>
+                  </div>
                 </div>
-                
-                <h3 className="text-sm font-bold leading-tight mb-2 group-hover:text-yellow-400 transition-colors line-clamp-3">
-                  {post.title}
-                </h3>
-                
-                <p className="text-[11px] text-white/40 line-clamp-2 mt-auto">
-                  {post.preview}
-                </p>
-              </div>
-              
-              {/* Hover Indicator */}
-              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="bg-yellow-400 text-black p-1 rounded-full">
-                  <ChevronRight size={14} />
+                <div className="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 font-bold">
+                  {post.category.toUpperCase()}
                 </div>
               </div>
+
+              <div className="aspect-[16/9] rounded-2xl overflow-hidden mb-4 relative">
+                <img src={post.img} className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" alt="" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                  <div className="bg-yellow-400 text-black text-[10px] font-black px-3 py-1 rounded-full italic">READ REPORT</div>
+                </div>
+              </div>
+
+              <h3 className="font-bold text-base leading-snug mb-2 group-hover:text-yellow-400 transition-colors line-clamp-2 italic">
+                {post.title}
+              </h3>
+              <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">
+                {post.preview}
+              </p>
             </div>
           ))}
         </div>
       </main>
 
-      {/* Post Modal / Overlay */}
+      {/* Detail Modal */}
       {selectedPost && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-200">
-          <div 
-            className="absolute inset-0 bg-black/90 backdrop-blur-sm" 
-            onClick={() => setSelectedPost(null)}
-          />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in zoom-in-95 duration-200">
+          <div className="absolute inset-0 bg-black/95 backdrop-blur-md" onClick={() => setSelectedPost(null)} />
           
-          <div className="relative w-full max-w-4xl bg-[#121212] rounded-3xl border border-white/10 overflow-hidden shadow-2xl flex flex-col md:flex-row h-full max-h-[80vh]">
+          <div className="relative w-full max-w-5xl bg-[#111] rounded-[2rem] border-2 border-white/5 overflow-hidden flex flex-col md:flex-row h-[85vh] shadow-[0_0_100px_rgba(0,0,0,1)]">
             
-            <div className="md:hidden p-4 border-b border-white/5 flex justify-between items-center bg-[#181818]">
-              <span className="text-xs font-bold">{selectedPost.author}</span>
-              <button onClick={() => setSelectedPost(null)} className="p-1 hover:bg-white/10 rounded-full">
-                <X size={20} />
-              </button>
-            </div>
+            {/* Close Button Overlay */}
+            <button 
+              onClick={() => setSelectedPost(null)}
+              className="absolute top-6 right-6 z-10 bg-red-500 hover:bg-red-600 p-2 rounded-xl text-white transition-all hover:scale-110 shadow-lg"
+            >
+              <X size={24} strokeWidth={3} />
+            </button>
 
-            <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar">
-              <div className="relative aspect-video rounded-xl overflow-hidden mb-8 border border-white/10">
-                 <img src={selectedPost.img} className="w-full h-full object-cover" alt="" />
-                 <div className="absolute top-4 left-4 bg-blue-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase italic shadow-lg">
-                   {selectedPost.category === 'General' ? 'Proxy Commissions' : 'Information'}
-                 </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-[#222] border border-white/10 flex items-center justify-center">
-                    <User size={20} className="text-white/40" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold tracking-tight">{selectedPost.author}</div>
-                    <div className="text-[10px] text-white/30">ID: {selectedPost.id * 1492}</div>
-                  </div>
+            {/* Content Area */}
+            <div className="flex-1 overflow-y-auto p-8 md:p-12 scroll-smooth custom-scrollbar">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-14 h-14 rounded-2xl bg-zinc-800 border border-white/10 flex items-center justify-center">
+                  <User size={32} className="text-zinc-500" />
                 </div>
+                <div>
+                  <h4 className="text-xl font-black italic uppercase tracking-tight">{selectedPost.author}</h4>
+                  <div className="text-xs text-zinc-500 font-mono tracking-widest uppercase">ID: NODE_{selectedPost.id * 142}</div>
+                </div>
+              </div>
 
-                <h1 className="text-2xl font-black leading-tight text-white italic tracking-tighter">
+              <div className="rounded-3xl overflow-hidden mb-8 border border-white/5 shadow-2xl">
+                <img src={selectedPost.img} className="w-full object-cover max-h-[400px]" alt="" />
+              </div>
+
+              <div className="bg-yellow-400/5 border-l-4 border-yellow-400 p-6 rounded-r-2xl mb-8">
+                <h2 className="text-2xl font-black italic mb-4 leading-tight">
                   {selectedPost.title}
-                </h1>
-                
-                <p className="text-white/70 leading-relaxed text-sm border-l-2 border-yellow-400 pl-4 py-1">
+                </h2>
+                <div className="text-zinc-300 leading-relaxed text-sm font-medium space-y-4">
                   {selectedPost.content}
-                </p>
+                </div>
               </div>
             </div>
 
-            <div className="w-full md:w-[350px] bg-[#0d0d0d] border-l border-white/5 flex flex-col">
-              <div className="p-4 border-b border-white/5 hidden md:flex justify-between items-center">
-                <span className="text-xs font-bold text-white/40">REPLIES ({selectedPost.replies.length})</span>
-                <button 
-                  onClick={() => setSelectedPost(null)}
-                  className="bg-red-500 hover:bg-red-600 p-1 rounded-lg transition-colors"
-                >
-                  <X size={18} />
-                </button>
+            {/* Sidebar Replies (Obsidian style) */}
+            <div className="w-full md:w-[400px] bg-[#0c0c0c] border-l border-white/5 flex flex-col">
+              <div className="p-6 border-b border-white/5 flex items-center justify-between bg-zinc-900/30">
+                <div className="flex items-center gap-2">
+                  <MessageSquare size={16} className="text-yellow-400" />
+                  <span className="text-xs font-black uppercase tracking-widest text-zinc-400 italic">Discussion</span>
+                </div>
+                <div className="text-[10px] font-bold bg-zinc-800 px-2 py-1 rounded text-zinc-500">
+                  {selectedPost.replies.length} REPLIES
+                </div>
               </div>
 
-              <div className="flex-grow overflow-y-auto p-4 space-y-6 custom-scrollbar">
-                {selectedPost.replies.length > 0 ? (
-                  selectedPost.replies.map((reply, i) => (
-                    <div key={i} className="group animate-in slide-in-from-right-4 duration-300" style={{ animationDelay: `${i * 100}ms` }}>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
-                            <User size={10} />
-                          </div>
-                          <span className="text-[11px] font-bold text-white/80">{reply.user}</span>
+              <div className="flex-grow overflow-y-auto p-6 space-y-8 custom-scrollbar">
+                {selectedPost.replies.map((reply, i) => (
+                  <div key={i} className="animate-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${i * 150}ms` }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded bg-zinc-800 flex items-center justify-center border border-white/5">
+                          <User size={12} />
                         </div>
-                        <span className="text-[10px] text-white/20 bg-white/5 px-1.5 py-0.5 rounded">{reply.floor}</span>
+                        <span className="text-[11px] font-black text-zinc-300 italic">{reply.user}</span>
                       </div>
-                      <p className="text-xs text-white/50 leading-normal pl-7">
-                        {reply.text}
-                      </p>
+                      <span className="text-[9px] font-mono text-zinc-600 bg-white/5 px-2 py-0.5 rounded uppercase tracking-widest">{reply.floor}</span>
                     </div>
-                  ))
-                ) : (
-                  <div className="h-full flex items-center justify-center opacity-20 italic text-sm">
-                    No one has replied yet...
+                    <p className="text-xs text-zinc-500 leading-normal pl-8 border-l border-white/5 ml-3">
+                      {reply.text}
+                    </p>
                   </div>
-                )}
+                ))}
               </div>
 
-              <div className="p-4 bg-[#151515] border-t border-white/5">
-                <div className="flex items-center gap-2 bg-black/40 rounded-xl p-2 border border-white/5">
+              <div className="p-6 bg-[#0a0a0a] border-t border-white/5">
+                <div className="relative group">
                   <input 
                     type="text" 
-                    placeholder="Type your reply..." 
-                    className="flex-grow bg-transparent border-none focus:outline-none text-xs p-1"
+                    placeholder="Contribute to thread..." 
+                    className="w-full bg-zinc-900 border-2 border-white/5 rounded-xl py-3 px-4 pr-12 text-xs focus:outline-none focus:border-yellow-400/50 transition-all italic font-medium"
                   />
-                  <button className="bg-yellow-400 text-black text-[10px] font-bold px-3 py-1 rounded-lg">
-                    SEND
+                  <button className="absolute right-2 top-1.5 bottom-1.5 px-4 bg-yellow-400 text-black text-[10px] font-black rounded-lg hover:bg-white transition-colors">
+                    POST
                   </button>
                 </div>
               </div>
@@ -248,20 +265,12 @@ const App = () => {
         </div>
       )}
 
+      {/* Global CSS for scrollbars */}
       <style dangerouslySetInnerHTML={{ __html: `
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #333;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #444;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #333; }
       `}} />
     </div>
   );
