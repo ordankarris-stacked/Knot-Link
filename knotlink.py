@@ -69,28 +69,15 @@ st.markdown("""
         color: #000000 !important;
     }
 
-    /* Sub-tabs Styling */
-    .stButton > button {
-        border-radius: 20px !important;
-        text-transform: uppercase !important;
-        font-weight: 700 !important;
-        font-size: 12px !important;
-        transition: 0.2s all !important;
-    }
-    
-    button[kind="primary"] {
-        background-color: #E2FF00 !important;
-        color: black !important;
+    /* Clickable Card Styling */
+    .stButton > button[kind="secondaryFormSubmit"], .stButton > button[kind="secondary"] {
         border: none !important;
-    }
-    
-    button[kind="secondary"] {
-        background-color: #1A1A1A !important;
-        color: #888 !important;
-        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        width: 100% !important;
+        transition: none !important;
     }
 
-    /* Vertical Card Style */
     .card-container {
         background-color: #111111;
         border-radius: 20px;
@@ -98,15 +85,17 @@ st.markdown("""
         border: 2px solid #222;
         margin-bottom: 10px;
         position: relative;
-        height: 500px;
+        height: 480px;
         display: flex;
         flex-direction: column;
-        transition: transform 0.2s, border-color 0.2s;
+        transition: transform 0.2s, border-color 0.2s, background-color 0.2s;
+        text-align: left;
     }
     
     .card-container:hover {
         border-color: #E2FF00;
-        transform: translateY(-8px);
+        transform: translateY(-5px);
+        background-color: #161616;
     }
 
     .card-image-box {
@@ -115,7 +104,6 @@ st.markdown("""
         background-position: center;
         width: 100%;
         position: relative;
-        border-radius: 18px 18px 0 0;
     }
 
     .card-overlay {
@@ -181,7 +169,13 @@ st.markdown("""
         border-radius: 0 10px 10px 0;
     }
 
-    /* Sidebar Styling */
+    /* Filter Tabs styling fix */
+    .filter-btn-container {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
     section[data-testid="stSidebar"] {
         background-color: #0A0A0A !important;
         border-right: 1px solid #222;
@@ -201,20 +195,20 @@ if "posts" not in st.session_state:
             "id": 201,
             "author": "GlobalWatcher", 
             "title": "[Post] Did y'all hear? Tech Giant's CEO just got the boot!", 
-            "content": "Word on the street is the CEO of the leading chip manufacturer was taken down after a secret board meeting. Anyone know if this is legit or just rumors? Stock market is reacting already.",
+            "content": "Word on the street is the CEO of the leading chip manufacturer was taken down after a secret board meeting. Stock market is reacting already.",
             "faction": "General", 
             "image": "https://images.unsplash.com/photo-1560179707-f14e90ef3623?q=80&w=400",
             "replies": [
                 {"author": "ChopChop", "text": "Who? Why should we give a damn about any of this?"}, 
-                {"author": "Anonymous", "text": "Something must be happening in the silicon valley hub. Higher-ups cancelling events lately... it's fishy."},
-                {"author": "Beardy", "text": "Now that he's out of the picture, what about the new GPU lineup?"}
+                {"author": "Anonymous", "text": "Something must be happening in the silicon valley hub. Fishy situation."},
+                {"author": "Beardy", "text": "What about the new GPU lineup?"}
             ]
         },
         {
             "id": 202,
             "author": "SpaceXplorer", 
             "title": "[News] New Artemis II Mission Photos Released", 
-            "content": "NASA has just published high-res imagery from the latest lunar orbiter. The clarity of the south pole craters is unprecedented. Science twitter is blowing up.",
+            "content": "NASA has just published high-res imagery from the latest lunar orbiter. The clarity of the south pole craters is unprecedented.",
             "faction": "General", 
             "image": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=400",
             "replies": [{"author": "MoonLover", "text": "The lighting in these is incredible."}]
@@ -222,8 +216,8 @@ if "posts" not in st.session_state:
         {
             "id": 203,
             "author": "SysAdmin_Help", 
-            "title": "[Question] How to quickly secure your cloud environment as a beginner?", 
-            "content": "Just started a small startup. We use AWS and Azure. What are the 'Carrot' essentials? I just want to make sure I don't get hit by ransomware on week one.",
+            "title": "[Question] How to quickly secure your cloud environment?", 
+            "content": "Just started a small startup. We use AWS and Azure. What are the 'Carrot' essentials to prevent ransomware?",
             "faction": "Help Info", 
             "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=400",
             "replies": [{"author": "Kitty_Freak", "text": "Enable MFA everywhere. That's step one. Don't skip it!"}]
@@ -232,7 +226,7 @@ if "posts" not in st.session_state:
             "id": 204,
             "author": "MarketPulse", 
             "title": "[Alert] Major Beverage Brand pulls out of Sponsorship", 
-            "content": "The blue and red soda brand has officially terminated its contract with the largest esports league. Claims of 'strategic realignment' are circulating.",
+            "content": "The blue and red soda brand has officially terminated its contract with the largest esports league.",
             "faction": "General", 
             "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400",
             "replies": []
@@ -260,16 +254,15 @@ with header_col2:
     """, unsafe_allow_html=True)
 
 # --- FILTER TABS ---
-tab_cols = st.columns([0.8, 1, 1.2, 5])
+f_col1, f_col2, f_col3, f_col4 = st.columns([0.8, 1, 1.2, 5])
 filters = ["All", "General", "Help Info"]
 
 for idx, f_name in enumerate(filters):
-    with tab_cols[idx]:
+    with [f_col1, f_col2, f_col3][idx]:
         is_active = st.session_state.current_filter == f_name
-        # Clicking these filters jumps the page back to 'All' or specific categories and resets selected_post
         if st.button(f_name, key=f"tab_filter_{f_name}", type="primary" if is_active else "secondary", use_container_width=True):
             st.session_state.current_filter = f_name
-            st.session_state.selected_post = None # Jump back to the board
+            st.session_state.selected_post = None
             st.rerun()
 
 st.write("") 
@@ -279,8 +272,7 @@ with st.sidebar:
     st.markdown("### 🛰️ TRANSMISSION")
     st.markdown(f"**Logon:** <span style='color:#E2FF00;'>Verified_Node_77</span>", unsafe_allow_html=True)
     st.write("---")
-    st.markdown("**New Signal**")
-    new_title = st.text_input("Signal Title", placeholder="e.g. [Alert] Vulnerability found...")
+    new_title = st.text_input("Signal Title", placeholder="e.g. [Alert] News...")
     new_content = st.text_area("Signal Body", placeholder="Broadcast a message...")
     post_category = st.selectbox("Frequency", ["General", "Help Info"])
     if st.button("SEND SIGNAL", use_container_width=True, type="primary"):
@@ -300,11 +292,9 @@ with st.sidebar:
 # --- MAIN CONTENT ---
 if st.session_state.selected_post:
     post = st.session_state.selected_post
-    col_back, col_spacer = st.columns([1, 4])
-    with col_back:
-        if st.button("← RETURN TO BOARD", use_container_width=True):
-            st.session_state.selected_post = None
-            st.rerun()
+    if st.button("← RETURN TO BOARD"):
+        st.session_state.selected_post = None
+        st.rerun()
     
     st.markdown(f"### {post.get('title')}")
     detail_img_col, detail_text_col = st.columns([1, 1.2])
@@ -317,8 +307,6 @@ if st.session_state.selected_post:
         st.info(post.get('content'))
         st.write("---")
         st.markdown("**COMMUNITY LOGS**")
-        if not post.get('replies'):
-            st.write("*No signals received for this post yet.*")
         for i, r in enumerate(post.get('replies', [])):
             st.markdown(f"""
                 <div class="detail-comment-box">
@@ -333,37 +321,31 @@ else:
     if st.session_state.current_filter != "All":
         display_posts = [p for p in st.session_state.posts if p.get('faction') == st.session_state.current_filter]
 
-    if not display_posts:
-        st.warning("No data found on this frequency.")
-    else:
-        # Create a responsive grid
+    if display_posts:
         rows = [display_posts[i:i + 4] for i in range(0, len(display_posts), 4)]
-        
         for row in rows:
             cols = st.columns(4)
             for idx, post in enumerate(row):
-                p_id = post.get('id')
-                img_url = post.get('image', "")
-                p_title = post.get('title', "Untitled Signal")
-                p_author = post.get('author', "Unknown")
-                p_content = post.get('content', "...")
-
                 with cols[idx]:
-                    st.markdown(f"""
+                    # Create the visual card inside the button to make the whole card clickable
+                    card_html = f"""
                         <div class="card-container">
-                            <div class="card-image-box" style="background-image: url('{img_url}');">
+                            <div class="card-image-box" style="background-image: url('{post.get('image')}');">
                                 <div class="card-overlay">
-                                    <div class="post-title">{p_title}</div>
-                                    <div class="post-content-preview">{p_content}</div>
+                                    <div class="post-title">{post.get('title')}</div>
+                                    <div class="post-content-preview">{post.get('content')}</div>
                                 </div>
                             </div>
                             <div class="card-footer">
                                 <div class="author-avatar">⚡</div>
-                                <div class="author-name">{p_author}</div>
+                                <div class="author-name">{post.get('author')}</div>
                             </div>
                         </div>
-                    """, unsafe_allow_html=True)
-                    
-                    if st.button(f"READ SIGNAL #{p_id}", key=f"btn_view_{p_id}", use_container_width=True):
+                    """
+                    # We wrap the UI in a button. By CSS we hide the button borders so it looks like a card.
+                    if st.button("", key=f"card_btn_{post.get('id')}", use_container_width=True):
                         st.session_state.selected_post = post
                         st.rerun()
+                    
+                    # Overlay the HTML visually at the same position
+                    st.markdown(f'<div style="margin-top:-60px; pointer-events:none;">{card_html}</div>', unsafe_allow_html=True)
