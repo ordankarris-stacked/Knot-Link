@@ -233,7 +233,7 @@ with st.sidebar:
             final_img = f"https://picsum.photos/seed/{new_img_seed}/400/300" if new_img_seed.strip() else None
             
             new_post = {
-                "author": "PHAETHON",
+                "author": "Anonymous User",
                 "title": new_title,
                 "content": new_content,
                 "img": final_img,
@@ -244,6 +244,6 @@ with st.sidebar:
             st.rerun()
 
     st.write("---")
-    st.caption(f"Logged in: PHAETHON")
+    st.caption(f"Logged in: Anonymous User")
     st.caption(f"Active Filter: {st.session_state.filter}")
     st.success("SYNC: ACTIVE")
