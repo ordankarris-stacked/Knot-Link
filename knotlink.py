@@ -4,7 +4,7 @@ from datetime import datetime
 
 # --- CONFIGURATION & THEMING ---
 st.set_page_config(
-    page_title="Inter-Knot // Proxy Terminal",
+    page_title="KNOT-LINK // PHAETHON GATEWAY",
     page_icon="🟠",
     layout="wide"
 )
@@ -86,18 +86,25 @@ st.markdown("""
 if 'posts' not in st.session_state:
     st.session_state.posts = [
         {
-            "author": "GhostInTheGrid",
-            "title": "Safety tips for the Lumina Square Hollow exit",
-            "content": "Notice: The usual path near the parking garage is getting unstable. Saw some Ethereals camping the extraction point.",
+            "author": "Neon_Caster",
+            "title": "Signal interference near the Construction Hub",
+            "content": "Heads up. My sync rates dropped by 15% near the old crane. Might be an Ether-dense pocket forming or just H.A.N.D. jamming signals again.",
             "tags": ["Intel", "Safety"],
             "timestamp": time.time()
         },
         {
-            "author": "Rookie_Proxy_04",
-            "title": "Why does my Bangboo keep pointing at the ceiling?",
-            "content": "I've been in the Hollow for 2 hours and my E-Series won't stop looking up. There's nothing there.",
+            "author": "Hollow_Rabbit",
+            "title": "Anyone seen a runaway 'Security' Bangboo?",
+            "content": "Lost my modified Butler unit in the back alleys of 6th Street. It has a red scarf and answers to 'Binky'. Reward: One box of premium noodles.",
             "tags": ["Help", "Bangboo"],
-            "timestamp": time.time() - 3600
+            "timestamp": time.time() - 7200
+        },
+        {
+            "author": "Ether_Diver_Zero",
+            "title": "The rumor about the 'White Room' is real.",
+            "content": "Found a localized distortion that doesn't show up on any Proxy map. It was completely silent inside. If you see a glitching vending machine, don't touch it.",
+            "tags": ["Rumor", "Intel"],
+            "timestamp": time.time() - 15000
         }
     ]
 
@@ -106,7 +113,7 @@ with st.sidebar:
     st.markdown("""
         <div class="fairy-container">
             <div class="fairy-eye"></div>
-            <h2 class="header-text" style="font-size: 1.5rem; margin: 0;">INTER-KNOT</h2>
+            <h2 class="header-text" style="font-size: 1.5rem; margin: 0;">KNOT-LINK</h2>
         </div>
     """, unsafe_allow_html=True)
     
@@ -122,16 +129,16 @@ with st.sidebar:
     st.success("● SECURE CONNECTION")
 
 # --- MAIN CONTENT ---
-st.markdown('<h1 class="header-text">The Proxy Lounge</h1>', unsafe_allow_html=True)
-st.caption("// Anonymous discussion and intel exchange for verified Proxies.")
+st.markdown('<h1 class="header-text">KNOT-LINK // Proxy Lounge</h1>', unsafe_allow_html=True)
+st.caption("// Secure communication channel for verified Proxy operators.")
 
 # Posting Interface
 with st.expander("➕ START NEW THREAD", expanded=False):
     with st.form("new_post_form", clear_on_submit=True):
         title = st.text_input("Thread Title", placeholder="Enter a descriptive title...")
         content = st.text_area("Content", placeholder="Share your intel...")
-        tags = st.multiselect("Tags", ["Intel", "Safety", "Help", "Bangboo", "General"], default=["General"])
-        submit = st.form_submit_button("SUBMIT TO INTER-KNOT")
+        tags = st.multiselect("Tags", ["Intel", "Safety", "Help", "Bangboo", "General", "Rumor"], default=["General"])
+        submit = st.form_submit_button("TRANSMIT TO KNOT-LINK")
         
         if submit and title and content:
             new_entry = {
