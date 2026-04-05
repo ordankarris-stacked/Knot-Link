@@ -69,14 +69,15 @@ st.markdown("""
         color: black;
     }
 
-    /* Post Card Grid Styling */
+    /* Post Card Grid Styling - Redesigned for News/User Style */
     .card-container {
         background-color: #111111;
-        border-radius: 20px;
+        border-radius: 15px;
         overflow: hidden;
-        border: 2px solid #222222;
+        border: 1px solid #222222;
         margin-bottom: 20px;
         transition: transform 0.2s;
+        position: relative;
     }
     
     .card-container:hover {
@@ -85,63 +86,72 @@ st.markdown("""
     }
 
     .card-image {
-        height: 200px;
+        height: 250px;
         background-size: cover;
         background-position: center;
         width: 100%;
         display: flex;
-        align-items: flex-end;
-        padding: 10px;
+        flex-direction: column;
+        justify-content: flex-end;
         /* Blackout effect for missing images */
         background-color: #050505; 
-        border-bottom: 1px solid #1A1A1A;
+        position: relative;
     }
 
-    .card-footer {
-        background-color: #1A1A1A;
+    /* Gradient overlay for text readability on images */
+    .card-overlay {
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
         padding: 15px;
-        min-height: 120px;
-    }
-
-    .author-badge {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 10px;
-        background: rgba(0,0,0,0.5);
-        padding: 4px 8px;
-        border-radius: 10px;
-    }
-
-    .author-avatar {
-        width: 24px;
-        height: 24px;
-        background-color: #E2FF00;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    .author-name {
-        font-weight: bold;
-        font-size: 13px;
-        color: #DDD;
+        width: 100%;
     }
 
     .post-title {
         font-weight: bold;
-        font-size: 15px;
-        line-height: 1.2;
-        margin-bottom: 5px;
+        font-size: 16px;
+        line-height: 1.3;
+        margin-bottom: 4px;
         color: #FFFFFF;
     }
 
     .post-content {
-        color: #888;
+        color: #BBBBBB;
         font-size: 12px;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
         overflow: hidden;
+    }
+
+    .card-footer {
+        background-color: #0F0F0F;
+        padding: 10px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-top: 1px solid #1A1A1A;
+    }
+
+    .author-avatar {
+        width: 20px;
+        height: 20px;
+        background-color: #E2FF00;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    .author-name {
+        font-weight: bold;
+        font-size: 12px;
+        color: #EEEEEE;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .author-suffix {
+        color: #666;
+        font-size: 12px;
     }
 
     /* Input Styling */
@@ -166,12 +176,12 @@ st.markdown("""
 # --- SESSION STATE INITIALIZATION ---
 if "posts" not in st.session_state:
     st.session_state.posts = [
+        {"author": "r/politics", "title": "Trump issues warning to Iran", "content": "Trump Vows To Strike Civilian Infrastruct...", "faction": "Global News", "image": None},
+        {"author": "r/worldnews", "title": "US rescues missing pilot", "content": "U.S. forces rescue second crew member...", "faction": "Military", "image": None},
+        {"author": "r/spaceporn", "title": "New Artemis II photos", "content": "New image from NASA: For the first tim...", "faction": "Science", "image": None},
+        {"author": "r/Music", "title": "Pepsi pulls out of Wi...", "content": "Pepsi Cancels Sponsorship c...", "faction": "Industry", "image": None},
         {"author": "Ghost_In_The_Hollow", "title": "[Notice] Vision's shocking scandal exposed!", "content": "Evidence of corruption in the Sixth Street sector has surfaced...", "faction": "Legendary Proxy", "image": None},
-        {"author": "Ether_Drifter", "title": "A new Hollow on Fourteenth Street!", "content": "High ether concentration detected. Avoid the subway entrance.", "faction": "Pathfinder", "image": None},
-        {"author": "Neon_Rabbit", "title": "[Question] Proxy Must-Knows: Carrots", "content": "How do you navigate the shifting grid patterns efficiently?", "faction": "Hearsay Hunter", "image": None},
-        {"author": "MetisIntel", "title": "The Red Fang Gang's doomsday?!", "content": "Internal power struggles are tearing the faction apart.", "faction": "Intel Node", "image": None},
-        {"author": "Worrybot", "title": "[Info] Beware of 'Freeman's Antlers'", "content": "Reports of a dangerous entity roaming the zero zone.", "faction": "Alert Bot", "image": None},
-        {"author": "QuQ", "title": "How to quickly level up IK account?", "content": "Beginner guide for new Proxies hitting New Eridu.", "faction": "Guide", "image": None}
+        {"author": "Ether_Drifter", "title": "A new Hollow on Fourteenth Street!", "content": "High ether concentration detected. Avoid the subway entrance.", "faction": "Pathfinder", "image": None}
     ]
 
 if "user_id" not in st.session_state:
@@ -187,7 +197,7 @@ st.markdown("""
     </div>
     <div class="sub-nav-container">
         <div class="sub-nav-item sub-nav-active">All</div>
-        <div class="sub-nav-item">General</div>
+        <div class="sub-nav-item">News</div>
         <div class="sub-nav-item">Help Request Info</div>
     </div>
 """, unsafe_allow_html=True)
@@ -201,16 +211,16 @@ with st.sidebar:
     if st.button("SEND SIGNAL"):
         if new_post.strip() and new_title.strip():
             entry = {
-                "author": st.session_state.user_id,
+                "author": f"r/{st.session_state.user_id}",
                 "title": new_title,
                 "content": new_post,
-                "faction": "Active Proxy",
+                "faction": "User Post",
                 "image": None
             }
             st.session_state.posts.insert(0, entry)
             st.rerun()
 
-# --- FEED RENDERER (MASONRY GRID) ---
+# --- FEED RENDERER (GRID) ---
 cols = st.columns(3)
 
 for idx, post in enumerate(st.session_state.posts):
@@ -224,14 +234,15 @@ for idx, post in enumerate(st.session_state.posts):
         st.markdown(f"""
             <div class="card-container">
                 <div class="card-image" style="{bg_style}">
-                    <div class="author-badge">
-                        <div class="author-avatar"></div>
-                        <span class="author-name">{post.get('author', 'Unknown')}</span>
+                    <div class="card-overlay">
+                        <div class="post-title">{post.get('title', 'Untitled')}</div>
+                        <div class="post-content">{post.get('content', 'No content available.')}</div>
                     </div>
                 </div>
                 <div class="card-footer">
-                    <div class="post-title">{post.get('title', 'Untitled')}</div>
-                    <div class="post-content">{post.get('content', 'No content available.')}</div>
+                    <div class="author-avatar"></div>
+                    <span class="author-name">{post.get('author', 'Unknown')}</span>
+                    <span class="author-suffix">以及更多</span>
                 </div>
             </div>
         """, unsafe_allow_html=True)
