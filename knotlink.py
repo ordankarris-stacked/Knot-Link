@@ -12,29 +12,31 @@ st.set_page_config(
 # --- CUSTOM CSS (ZZZ AESTHETIC REPLICATION) ---
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap');
 
     /* Main Background with Diagonal Stripes */
     .stApp {
         background-color: #000000;
-        background-image: linear-gradient(135deg, #0a0a0a 25%, transparent 25%), 
-                          linear-gradient(225deg, #0a0a0a 25%, transparent 25%), 
-                          linear-gradient(45deg, #0a0a0a 25%, transparent 25%), 
-                          linear-gradient(315deg, #0a0a0a 25%, #000000 25%);
-        background-position: 10px 0, 10px 0, 0 0, 0 0;
-        background-size: 20px 20px;
-        background-repeat: repeat;
+        background-image: radial-gradient(circle at 2px 2px, #111 1px, transparent 0);
+        background-size: 24px 24px;
         color: #FFFFFF;
         font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Top Left Title Branding - Adjusted for Streamlit Layout */
+    /* Top Left Title Branding - Enhanced ZZZ Style */
+    .brand-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
     .brand-title {
-        font-size: 28px;
-        font-weight: 900;
+        font-size: 32px;
+        font-weight: 800;
         color: #FFFFFF;
-        letter-spacing: -1px;
-        margin-bottom: 10px;
+        letter-spacing: -1.5px;
+        text-transform: uppercase;
+        font-style: italic;
     }
     .brand-title span {
         color: #E2FF00;
@@ -46,15 +48,15 @@ st.markdown("""
         justify-content: flex-end;
         align-items: center;
         padding: 10px 0;
-        gap: 15px;
+        gap: 10px;
     }
 
     .nav-btn {
         background-color: #333333;
-        color: #AAAAAA;
-        padding: 8px 30px;
-        border-radius: 25px;
-        font-weight: bold;
+        color: #FFFFFF;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 700;
         font-size: 14px;
         text-transform: uppercase;
         cursor: pointer;
@@ -68,48 +70,53 @@ st.markdown("""
     }
 
     /* Sub-tabs Styling (Yellow Pill shape for active) */
-    div.stButton > button {
-        background-color: #1A1A1A;
-        color: #888;
-        padding: 5px 20px;
-        border-radius: 20px;
-        font-size: 13px;
-        border: none;
-        transition: 0.3s;
-        width: 100%;
-        text-transform: uppercase;
-        font-weight: bold;
+    .stButton > button {
+        border-radius: 20px !important;
+        text-transform: uppercase !important;
+        font-weight: 700 !important;
+        font-size: 12px !important;
+        transition: 0.2s all !important;
+    }
+    
+    /* Force primary button to be the signature yellow */
+    button[kind="primary"] {
+        background-color: #E2FF00 !important;
+        color: black !important;
+        border: none !important;
+    }
+    
+    button[kind="secondary"] {
+        background-color: #1A1A1A !important;
+        color: #888 !important;
+        border: none !important;
     }
 
-    /* Target the specific "Active" button styles via Streamlit's secondary button class if possible, 
-       but for this build we'll use a specific logic in the Python loop. */
-
-    /* Vertical Card Style */
+    /* Vertical Card Style (Zenless Zone Zero Style) */
     .card-container {
         background-color: #111111;
-        border-radius: 15px;
+        border-radius: 20px;
         overflow: hidden;
         border: 2px solid #222;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
         position: relative;
-        height: 480px;
+        height: 520px;
         display: flex;
         flex-direction: column;
-        transition: transform 0.2s;
+        transition: transform 0.2s, border-color 0.2s;
     }
     
     .card-container:hover {
         border-color: #E2FF00;
-        transform: translateY(-5px);
+        transform: translateY(-8px);
     }
 
-    .card-image {
+    .card-image-box {
         flex: 1;
         background-size: cover;
         background-position: center;
         width: 100%;
         position: relative;
-        background-color: #222; /* Fallback color to prevent KeyError visual breaks */
+        border-radius: 18px 18px 0 0;
     }
 
     .card-overlay {
@@ -117,21 +124,21 @@ st.markdown("""
         bottom: 0;
         left: 0;
         right: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
-        padding: 15px;
+        background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 70%, transparent 100%);
+        padding: 20px;
     }
 
     .post-title {
-        font-weight: bold;
-        font-size: 15px;
-        line-height: 1.3;
-        margin-bottom: 8px;
+        font-weight: 800;
+        font-size: 16px;
+        line-height: 1.2;
+        margin-bottom: 10px;
         color: #FFFFFF;
     }
 
     .post-content-preview {
-        color: #BBB;
-        font-size: 11px;
+        color: #CCC;
+        font-size: 12px;
         line-height: 1.4;
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -140,36 +147,36 @@ st.markdown("""
     }
 
     .card-footer {
-        background-color: #181818;
-        padding: 12px 15px;
+        background-color: #1A1A1A;
+        padding: 15px 20px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         border-top: 1px solid #222;
     }
 
     .author-avatar {
-        width: 28px;
-        height: 28px;
-        background-color: #E2FF00;
+        width: 32px;
+        height: 32px;
+        background-color: #222;
         border-radius: 50%;
-        border: 2px solid #333;
+        border: 2px solid #E2FF00;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .author-name {
-        font-weight: bold;
-        font-size: 12px;
+        font-weight: 700;
+        font-size: 13px;
         color: #FFF;
     }
 
     /* Sidebar Styling */
     section[data-testid="stSidebar"] {
-        background-color: #0F0F0F !important;
-        border-right: 2px solid #222;
+        background-color: #0A0A0A !important;
+        border-right: 1px solid #222;
     }
 
     /* Hide default Streamlit elements */
@@ -229,7 +236,7 @@ if "current_filter" not in st.session_state:
 # --- TOP HEADER ---
 header_col1, header_col2 = st.columns([1, 2])
 with header_col1:
-    st.markdown('<div class="brand-title">KNOT-<span>LINK</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="brand-container"><div class="brand-title">KNOT-<span>LINK</span></div></div>', unsafe_allow_html=True)
 
 with header_col2:
     st.markdown("""
@@ -241,16 +248,14 @@ with header_col2:
     """, unsafe_allow_html=True)
 
 # --- FILTER TABS ---
-# To simulate the yellow pill for active tab, we use a slightly different button style logic
-tab_cols = st.columns([0.8, 1, 1, 5])
+# Sub-tabs styling with yellow pill for active state
+tab_cols = st.columns([0.8, 1, 1.2, 5])
 filters = ["All", "General", "Help Info"]
 
 for idx, f_name in enumerate(filters):
     with tab_cols[idx]:
         is_active = st.session_state.current_filter == f_name
-        # Using custom styling for the active state
-        btn_label = f_name
-        if st.button(btn_label, key=f"tab_{f_name}", type="primary" if is_active else "secondary"):
+        if st.button(f_name, key=f"tab_filter_{f_name}", type="primary" if is_active else "secondary", use_container_width=True):
             st.session_state.current_filter = f_name
             st.session_state.selected_post = None
             st.rerun()
@@ -265,7 +270,7 @@ with st.sidebar:
     new_title = st.text_input("Signal Title", placeholder="e.g. [Question] Leveling up...")
     new_content = st.text_area("Signal Body", placeholder="Broadcast a message...")
     post_category = st.selectbox("Frequency", ["General", "Help Info"])
-    if st.button("SEND SIGNAL", use_container_width=True):
+    if st.button("SEND SIGNAL", use_container_width=True, type="primary"):
         if new_content.strip() and new_title.strip():
             st.session_state.posts.insert(0, {
                 "id": random.randint(1000, 9999),
@@ -285,47 +290,50 @@ if st.session_state.selected_post:
         st.session_state.selected_post = None
         st.rerun()
     
-    # Detailed post view (simplified for stability)
-    st.image(post['image'], use_container_width=True)
-    st.title(post['title'])
-    st.write(post['content'])
+    st.image(post.get('image', ""), use_container_width=True)
+    st.title(post.get('title', "Untitled Signal"))
+    st.write(post.get('content', ""))
     st.write("---")
     st.subheader("Replies")
-    for r in post['replies']:
-        st.markdown(f"**{r['author']}**: {r['text']}")
+    for r in post.get('replies', []):
+        st.markdown(f"**{r.get('author', '??')}**: {r.get('text', '')}")
 
 else:
     # GRID VIEW
     display_posts = st.session_state.posts
     if st.session_state.current_filter != "All":
-        display_posts = [p for p in st.session_state.posts if p['faction'] == st.session_state.current_filter]
+        display_posts = [p for p in st.session_state.posts if p.get('faction') == st.session_state.current_filter]
 
+    # Calculate rows (4 columns grid)
     rows = [display_posts[i:i + 4] for i in range(0, len(display_posts), 4)]
     
     for row in rows:
         cols = st.columns(4)
         for idx, post in enumerate(row):
-            with cols[idx]:
-                # Error prevention: ensure 'image' and 'title' keys exist
-                img_url = post.get('image', "")
-                p_title = post.get('title', "Untitled Signal")
-                p_author = post.get('author', "Unknown")
-                p_content = post.get('content', "")
+            # SAFE DATA ACCESS to prevent KeyError crashes
+            p_id = post.get('id', random.randint(0, 9999))
+            img_url = post.get('image', "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400")
+            p_title = post.get('title', "Untitled Signal")
+            p_author = post.get('author', "Unknown")
+            p_content = post.get('content', "Signal strength confirmed. Welcome to the Node.")
 
+            with cols[idx]:
                 st.markdown(f"""
                     <div class="card-container">
-                        <div class="card-image" style="background-image: url('{img_url}');">
+                        <div class="card-image-box" style="background-image: url('{img_url}');">
                             <div class="card-overlay">
                                 <div class="post-title">{p_title}</div>
                                 <div class="post-content-preview">{p_content}</div>
                             </div>
                         </div>
                         <div class="card-footer">
-                            <div class="author-avatar">🛡️</div>
+                            <div class="author-avatar">🕶️</div>
                             <div class="author-name">{p_author}</div>
                         </div>
                     </div>
                 """, unsafe_allow_html=True)
-                if st.button(f"View Intel #{post['id']}", key=f"view_{post['id']}", use_container_width=True):
+                
+                # Use a specific key to ensure uniqueness
+                if st.button(f"OPEN INTEL #{p_id}", key=f"btn_view_{p_id}", use_container_width=True):
                     st.session_state.selected_post = post
                     st.rerun()
