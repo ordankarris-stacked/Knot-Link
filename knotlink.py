@@ -212,7 +212,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Sub-Category Filter
+# Sub-Category Filter (Updated to remove Fairy Picks)
 filter_cols = st.columns([5, 1, 1, 1])
 with filter_cols[1]:
     if st.button("All", use_container_width=True, type="primary" if st.session_state.filter == "All" else "secondary"):
@@ -278,8 +278,10 @@ else:
     cols = st.columns(3)
     for idx, post in enumerate(display_posts):
         image_url = post.get('img', 'https://picsum.photos/seed/default/800/600')
+        post_id = post.get('id')
         
         with cols[idx % 3]:
+            # Post Thumbnail Card
             st.markdown(f"""
                 <div class="knot-card">
                     <div class="card-bg" style="background-image: url('{image_url}');"></div>
@@ -294,8 +296,9 @@ else:
                 </div>
             """, unsafe_allow_html=True)
             
-            if st.button(f"OPEN THREAD ##{post['id']}", key=f"read_{post['id']}", use_container_width=True):
-                st.session_state.active_post_id = post['id']
+            # Interactive read button (Safe ID handling to prevent KeyErrors shown in images)
+            if st.button(f"OPEN THREAD ##{post_id}", key=f"read_{post_id}", use_container_width=True):
+                st.session_state.active_post_id = post_id
                 st.rerun()
 
 # --- SIDEBAR ---
