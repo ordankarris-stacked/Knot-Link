@@ -59,7 +59,7 @@ if 'posts' not in st.session_state:
             "title": "New Artemis II photos",
             "content": "New Image from NASA: For the first time, we see the far side of the moon in high definition.",
             "img": "https://picsum.photos/seed/moon/800/600",
-            "category": "Fairy Picks",
+            "category": "General",
             "replies": [{"user": "StarGazer", "text": "Simply breathtaking."}]
         },
         {
@@ -93,7 +93,7 @@ st.markdown("""
         font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Main Navigation Styling - Matching image_618b65.jpg */
+    /* Main Navigation Styling */
     .top-nav {
         display: flex;
         justify-content: flex-end;
@@ -121,7 +121,7 @@ st.markdown("""
         z-index: 2;
     }
 
-    /* Post Cards - Image Overlay Style matching screenshot */
+    /* Post Cards - Image Overlay Style */
     .knot-card {
         position: relative;
         height: 350px;
@@ -200,14 +200,6 @@ st.markdown("""
         border-left: 4px solid #f0e600;
         font-family: 'JetBrains Mono', monospace;
     }
-    
-    /* Category Tabs */
-    .filter-bar {
-        display: flex;
-        justify-content: flex-end;
-        gap: 15px;
-        margin-bottom: 25px;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -220,8 +212,8 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Sub-Category Filter (Matching image_618b65.jpg tabs)
-filter_cols = st.columns([4, 1, 1, 1, 1])
+# Sub-Category Filter
+filter_cols = st.columns([5, 1, 1, 1])
 with filter_cols[1]:
     if st.button("All", use_container_width=True, type="primary" if st.session_state.filter == "All" else "secondary"):
         st.session_state.filter = "All"
@@ -231,10 +223,6 @@ with filter_cols[2]:
         st.session_state.filter = "General"
         st.rerun()
 with filter_cols[3]:
-    if st.button("Fairy Picks", use_container_width=True, type="primary" if st.session_state.filter == "Fairy Picks" else "secondary"):
-        st.session_state.filter = "Fairy Picks"
-        st.rerun()
-with filter_cols[4]:
     if st.button("Help Info", use_container_width=True, type="primary" if st.session_state.filter == "Help Request Info" else "secondary"):
         st.session_state.filter = "Help Request Info"
         st.rerun()
@@ -287,13 +275,11 @@ if st.session_state.filter != "All":
 if not display_posts:
     st.info(f"No threads found in '{st.session_state.filter}'")
 else:
-    # 3-column grid for the "Notifications" view
     cols = st.columns(3)
     for idx, post in enumerate(display_posts):
         image_url = post.get('img', 'https://picsum.photos/seed/default/800/600')
         
         with cols[idx % 3]:
-            # HTML Card with Background Image
             st.markdown(f"""
                 <div class="knot-card">
                     <div class="card-bg" style="background-image: url('{image_url}');"></div>
@@ -308,14 +294,13 @@ else:
                 </div>
             """, unsafe_allow_html=True)
             
-            # Interactive read button
             if st.button(f"OPEN THREAD ##{post['id']}", key=f"read_{post['id']}", use_container_width=True):
                 st.session_state.active_post_id = post['id']
                 st.rerun()
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown('<h1 style="font-family: Orbitron; color: #f0e600; letter-spacing: 2px;">INTER-KNOT</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 style="font-family: Orbitron; color: #f0e600; letter-spacing: 2px;">KNOT-LINK</h1>', unsafe_allow_html=True)
     st.markdown('<p style="color: #888; font-size: 0.8rem;">PHAETHON ADMINISTRATIVE CONSOLE</p>', unsafe_allow_html=True)
     st.write("---")
     
@@ -323,7 +308,7 @@ with st.sidebar:
         st.write("PUBLISH NEW INTEL")
         new_title = st.text_input("Thread Title")
         new_content = st.text_area("Intel Summary")
-        new_category = st.selectbox("Assign Category", ["General", "Fairy Picks", "Help Request Info"])
+        new_category = st.selectbox("Assign Category", ["General", "Help Request Info"])
         new_img_keyword = st.text_input("Visual Seed (Keyword)")
         submitted = st.form_submit_button("BROADCAST")
         
