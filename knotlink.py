@@ -1,176 +1,130 @@
 import streamlit as st
-import pandas as pd
 from datetime import datetime
+import random
 
-# --- SETTINGS & CONFIG ---
+# --- UI CONFIGURATION ---
 st.set_page_config(
-    page_title="INTER-KNOT // Proxy Network",
-    page_icon="🔌",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    page_title="Knot-Link // Proxy Network",
+    page_icon="🕸️",
+    layout="centered",
 )
 
-# --- CUSTOM CSS FOR INTER-KNOT AESTHETIC ---
+# --- CUSTOM CSS (ZZZ AESTHETIC) ---
 st.markdown("""
     <style>
-    /* Main Background and Text */
+    /* Main Background */
     .stApp {
-        background-color: #0a0a0a;
-        color: #e0e0e0;
+        background-color: #0D0D0E;
+        color: #FFFFFF;
     }
     
-    /* Sidebar Styling */
-    [data-testid="stSidebar"] {
-        background-color: #0d0d0d;
-        border-right: 1px solid #333;
+    /* Header Styling */
+    .header-container {
+        border-bottom: 2px solid #FF6B00;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .header-title {
+        color: #FF6B00;
+        font-family: 'monospace';
+        letter-spacing: 2px;
+        font-weight: bold;
+        font-size: 24px;
     }
 
     /* Post Card Styling */
-    .knot-card {
-        background-color: #151515;
-        border-left: 4px solid #ff6b00;
-        padding: 20px;
-        border-radius: 0px 10px 10px 0px;
-        margin-bottom: 20px;
-        transition: transform 0.2s;
+    .post-card {
+        background-color: #161617;
+        border: 1px solid #27272A;
+        border-left: 4px solid #FF6B00;
+        padding: 15px;
+        border-radius: 2px;
+        margin-bottom: 10px;
     }
-    .knot-card:hover {
-        transform: translateX(5px);
-        background-color: #1a1a1a;
+    
+    .post-author {
+        color: #00E5FF;
+        font-family: 'monospace';
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .post-faction {
+        background-color: rgba(255, 107, 0, 0.1);
+        color: #FF6B00;
+        padding: 2px 6px;
+        font-size: 10px;
+        border: 1px solid #FF6B00;
+        margin-left: 10px;
+        text-transform: uppercase;
     }
 
-    /* Typography */
-    h1, h2, h3 {
-        font-family: 'Courier New', Courier, monospace;
-        text-transform: uppercase;
-        letter-spacing: 2px;
+    .post-time {
+        color: #666;
+        font-size: 11px;
+        float: right;
+    }
+
+    /* Input Area */
+    .stTextArea textarea {
+        background-color: #1A1A1B !important;
+        color: white !important;
+        border: 1px solid #27272A !important;
     }
     
-    .proxy-tag {
-        color: #ff6b00;
-        font-weight: bold;
-        font-size: 0.8rem;
-    }
-    
-    .status-badge {
-        background-color: #333;
-        color: #888;
-        padding: 2px 8px;
-        font-size: 0.7rem;
-        border-radius: 4px;
-        text-transform: uppercase;
+    /* Button Styling */
+    .stButton button {
+        background-color: #FF6B00 !important;
+        color: black !important;
+        font-weight: bold !important;
+        width: 100%;
+        border: none !important;
     }
     </style>
-    """, unsafe_allow_headers=True)
+""", unsafe_allow_html=True)
 
-# --- SESSION STATE (MOCK DATABASE) ---
-if 'posts' not in st.session_state:
+# --- SESSION STATE INITIALIZATION ---
+if "posts" not in st.session_state:
     st.session_state.posts = [
-        {
-            "id": 1,
-            "author": "Weh-nah-noo",
-            "title": "[Post] Did y'all hear? Porcelumex's CEO just got the boot!",
-            "content": "Heard Porcelumex's CEO Ferox got taken down. Anyone know if this is legit or just rumors?",
-            "time": "2024-05-20 14:30",
-            "likes": 42,
-            "category": "General"
-        },
-        {
-            "id": 2,
-            "author": "MetisIntelligence",
-            "title": "[News] Federal Reserve signals potential rate cut in Q3",
-            "content": "In a surprising move, the Federal Reserve Chair indicated that inflation targets are nearing the 2% threshold.",
-            "time": "2024-05-20 15:45",
-            "likes": 128,
-            "category": "General"
-        }
+        {"author": "Ghost_In_The_Hollow", "content": "Signal strength confirmed. Welcome to the Node.", "faction": "Legendary Proxy", "time": "SYSTEM_START"},
+        {"author": "Ether_Drifter", "content": "Anyone seeing weird distortions near the construction site?", "faction": "Pathfinder", "time": "10:42 AM"},
+        {"author": "Neon_Rabbit", "content": "Found a discarded Bangboo unit near the noodle shop. Anyone lost one?", "faction": "Hearsay Hunter", "time": "09:15 AM"}
     ]
 
-# --- SIDEBAR NAVIGATION ---
-with st.sidebar:
-    st.markdown("<h1 style='color: #ff6b00;'>INTER-KNOT</h1>", unsafe_allow_headers=True)
-    st.caption("v4.0.5-STABLE // Node: New Eridu")
-    
-    st.divider()
-    
-    menu = st.radio(
-        "NETWORK NAVIGATION",
-        ["Lounge (Feed)", "Intel Sharing", "Profile"],
-        index=0
-    )
-    
-    st.divider()
-    st.markdown("### 👤 PROXY_INFO")
-    st.markdown("**ID:** PHAETHON")
-    st.markdown("**RANK:** <span style='color:#3b82f6'>Legendary (LV.60)</span>", unsafe_allow_headers=True)
-    
-    if st.button("🔄 REFRESH SYNC"):
-        st.rerun()
+if "user_id" not in st.session_state:
+    # Generate a more interesting default proxy name
+    prefixes = ["Signal", "Static", "Void", "Cipher", "Data"]
+    st.session_state.user_id = f"{random.choice(prefixes)}_Proxy_{random.randint(100, 999)}"
 
-# --- APP LOGIC ---
+# --- HEADER ---
+st.markdown('<div class="header-container"><span class="header-title">KNOT-LINK // NETWORK</span></div>', unsafe_allow_html=True)
+st.markdown(f"**Current Signal ID:** `{st.session_state.user_id}`")
 
-if menu == "Lounge (Feed)":
-    st.markdown("## // THE PROXY LOUNGE")
-    
-    # NEW POST SECTION
-    with st.expander("➕ CREATE NEW ENCRYPTED BROADCAST"):
-        with st.form("new_post_form", clear_on_submit=True):
-            title = st.text_input("Thread Title")
-            content = st.text_area("Intel Content")
-            submit = st.form_submit_button("CONFIRM BROADCAST")
-            
-            if submit and title and content:
-                new_entry = {
-                    "id": len(st.session_state.posts) + 1,
-                    "author": "PHAETHON",
-                    "title": title,
-                    "content": content,
-                    "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                    "likes": 0,
-                    "category": "General"
-                }
-                st.session_state.posts.insert(0, new_entry)
-                st.success("Thread synchronized with Inter-Knot.")
-                st.rerun()
+# --- BROADCAST INPUT ---
+with st.container():
+    new_post = st.text_area("", placeholder="Broadcast a message to the network...", label_visibility="collapsed")
+    if st.button("REPLY"):
+        if new_post.strip():
+            entry = {
+                "author": st.session_state.user_id,
+                "content": new_post,
+                "faction": "Active Proxy",
+                "time": datetime.now().strftime("%I:%M %p")
+            }
+            # Insert at the top of the list
+            st.session_state.posts.insert(0, entry)
+            st.rerun()
 
-    # FILTER SEARCH
-    search = st.text_input("🔍 Search network threads...", "")
-
-    # DISPLAY POSTS
-    for post in st.session_state.posts:
-        if search.lower() in post['title'].lower() or search.lower() in post['content'].lower():
-            st.markdown(f"""
-                <div class="knot-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span class="proxy-tag">@{post['author']}</span>
-                        <span class="status-badge">#{post['id']:03d}</span>
-                    </div>
-                    <h3 style="margin-top: 10px;">{post['title']}</h3>
-                    <p style="font-size: 0.9rem; color: #aaa;">{post['content']}</p>
-                    <div style="margin-top: 15px; display: flex; gap: 20px; font-size: 0.7rem; color: #555;">
-                        <span>📅 {post['time']}</span>
-                        <span>❤️ {post['likes']} LIKES</span>
-                        <span style="color: #ff6b00;">[ACCESS_DATA]</span>
-                    </div>
-                </div>
-            """, unsafe_allow_headers=True)
-
-elif menu == "Intel Sharing":
-    st.markdown("## // INTEL SHARING")
-    st.info("Searching for high-value Hollow commissions...")
-    st.image("https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800", caption="Encrypted Data Stream")
-    st.warning("Warning: Connection to Outpost 01 is currently unstable.")
-
-elif menu == "Profile":
-    st.markdown("## // PROXY PROFILE: PHAETHON")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Inter-Knot Credits", "45,200", "+1,200")
-        st.metric("Successful Commissions", "142")
-    with col2:
-        st.metric("Trust Level", "MAX", "Fairy Sync: 99%")
-        st.metric("Hollow Zero Keys", "3")
-
-# --- FOOTER ---
 st.markdown("---")
-st.caption("Unauthorized access to Inter-Knot is punishable by H.A.N.D. regulation. Stay safe, Proxy.")
+
+# --- FEED RENDERER ---
+for post in st.session_state.posts:
+    st.markdown(f"""
+        <div class="post-card">
+            <span class="post-author">{post['author']}</span>
+            <span class="post-faction">{post['faction']}</span>
+            <span class="post-time">{post['time']}</span>
+            <div style="margin-top: 10px; font-size: 16px;">{post['content']}</div>
+        </div>
+    """, unsafe_allow_html=True)
