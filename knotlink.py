@@ -125,7 +125,7 @@ st.markdown("""
     </div>
     <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 40px;">
         <span style="background: #f0e600; color: black; padding: 2px 15px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">All</span>
-        <span style="color: white; font-size: 0.7rem; padding: 2px 10px;">Fairy Picks</span>
+        <span style="color: white; font-size: 0.7rem; padding: 2px 10px;">General</span>
         <span style="color: white; font-size: 0.7rem; padding: 2px 10px;">Help Request Info</span>
     </div>
 """, unsafe_allow_html=True)
