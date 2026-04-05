@@ -9,70 +9,74 @@ st.set_page_config(
     layout="wide"
 )
 
-# Initialize Session State for Filter, Posts, and Active Post (for modal view)
+# Initialize Session State
 if 'filter' not in st.session_state:
     st.session_state.filter = "All"
 
 if 'active_post_id' not in st.session_state:
     st.session_state.active_post_id = None
 
+# Sample Data with Real Life Information
 if 'posts' not in st.session_state:
-    # Categories: "General", "Help Request Info"
     st.session_state.posts = [
         {
-            "id": 1,
-            "author": "Reuters_Global",
-            "title": "[News] Federal Reserve signals potential rate cut in Q3",
-            "content": "In a surprising move, the Federal Reserve Chair indicated that inflation targets are nearing the 2% threshold, suggesting a shift in monetary policy to support labor market stability.",
-            "img": "https://picsum.photos/seed/finance/800/600",
+            "id": 101,
+            "author": "TechCrunch",
+            "title": "[News] OpenAI reveals 'Sora' text-to-video capabilities",
+            "content": "The new model can generate up to a minute of high-fidelity video from text prompts. Experts are discussing the implications for the film industry and deepfake detection.",
+            "img": "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
             "category": "General",
             "replies": [
-                {"user": "MarketWatcher", "text": "About time, the housing market needs some breathing room."},
-                {"user": "EconStudent_99", "text": "Will this impact the dollar index significantly?"}
+                {"user": "VFX_Artist", "text": "This is both terrifying and exciting for my career."},
+                {"user": "CinemaLover", "text": "Will we ever know what's real anymore?"}
             ]
         },
         {
-            "id": 2,
-            "author": "TechCrunch_Official",
-            "title": "[Tech] New generative AI model breaks benchmarks for reasoning",
-            "content": "The latest model from leading research labs demonstrates unprecedented capabilities in mathematical proofing and complex coding tasks, raising questions about future software automation.",
-            "img": "https://picsum.photos/seed/ai_robot/800/600",
+            "id": 102,
+            "author": "Reuters_Finance",
+            "title": "[Market] Global markets rally on cooling inflation data",
+            "content": "Stocks across Asia and Europe saw a 2% jump today after the latest CPI reports suggested central banks might pause rate hikes earlier than expected.",
+            "img": "https://images.unsplash.com/photo-1611974717482-bc12301f9d69?auto=format&fit=crop&q=80&w=800",
+            "category": "General",
+            "replies": [
+                {"user": "BullRun24", "text": "My portfolio is finally green again!"}
+            ]
+        },
+        {
+            "id": 103,
+            "author": "IT_Support_Global",
+            "title": "[Help] How to secure your home network against IoT exploits",
+            "content": "Recent reports show a 300% increase in smart-fridge botnets. Follow this guide to segment your VLANs and update your router firmware immediately.",
+            "img": "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&q=80&w=800",
             "category": "Help Request Info",
             "replies": [
-                {"user": "Dev_Lead", "text": "I tried the beta, the context window is actually insane."},
-                {"user": "Privacy_First", "text": "What about the training data transparency?"}
+                {"user": "HomeLabber", "text": "Great guide. Most people forget to change the default admin password."},
+                {"user": "SafetyFirst", "text": "Is WPA3 enough or should I stick to wired?"}
             ]
         },
         {
-            "id": 3,
-            "author": "Climate_Monitor",
-            "title": "[Alert] Record-breaking heatwave predicted for Northern Hemisphere",
-            "content": "Meteorologists warn that El Niño patterns combined with rising sea surface temperatures will likely lead to the hottest summer on record for North America and Europe.",
-            "img": "https://picsum.photos/seed/weather/800/600",
+            "id": 104,
+            "author": "SpaceX_Watch",
+            "title": "[Intel] Starship Flight 4 scheduled for next month",
+            "content": "Internal documents suggest the next launch attempt will focus on soft landing the booster in the Gulf of Mexico. Testing at Starbase is intensifying.",
+            "img": "https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&q=80&w=800",
             "category": "General",
             "replies": []
         },
         {
-            "id": 5,
-            "author": "CyberSecurity_Net",
-            "title": "[Security] Critical vulnerability found in widely used open-source library",
-            "content": "Security researchers have identified a zero-day exploit in the standard logging library used by 70% of enterprise web applications. Patching is required immediately.",
-            "img": "https://picsum.photos/seed/security/800/600",
+            "id": 105,
+            "author": "GreenTech_Daily",
+            "title": "[Info] Solid-state battery breakthrough reported in Japan",
+            "content": "Researchers claim a 1,000km range with a 10-minute charge time. This could be the tipping point for the global transition to electric vehicles.",
+            "img": "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=800",
             "category": "Help Request Info",
-            "replies": [{"user": "SysAdmin_Pro", "text": "Coffee is going to be my best friend tonight while I patch these servers."}]
-        },
-        {
-            "id": 6,
-            "author": "r/politics",
-            "title": "Trump issues warning to Iran regarding maritime trade",
-            "content": "Donald Trump Vows To Strike Civilian Infrastructure if regional threats continue to escalate. Tensions rise in the region as diplomatic efforts face new challenges.",
-            "img": "https://picsum.photos/seed/trump/800/600",
-            "category": "General",
-            "replies": []
+            "replies": [
+                {"user": "EV_Fan", "text": "I've been hearing '5 years away' for 10 years, hope this is real."}
+            ]
         }
     ]
 
-# Custom CSS
+# Custom CSS for UI
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700&display=swap');
@@ -83,51 +87,48 @@ st.markdown("""
         font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Main Navigation Styling */
-    .top-nav {
+    /* Top Nav Style */
+    .nav-container {
         display: flex;
         justify-content: flex-end;
         gap: 0px;
-        margin-bottom: 20px;
-        padding: 10px 0;
-        background: transparent;
+        margin-bottom: 25px;
     }
-    .nav-item {
+    .nav-btn {
         background: transparent;
-        color: #ffffff;
-        padding: 10px 40px;
-        font-weight: bold;
-        font-style: italic;
-        text-transform: none;
-        font-size: 1.2rem;
+        color: #fff;
+        padding: 10px 30px;
         font-family: 'Orbitron', sans-serif;
-        border-radius: 30px;
-        margin-left: -15px;
-        transition: 0.3s;
+        font-weight: bold;
+        font-size: 1.1rem;
+        border-radius: 25px;
+        margin-left: -10px;
+        border: none;
     }
-    .nav-item.active {
+    .nav-btn.active {
         background: #f0e600;
-        color: #000000;
-        z-index: 2;
+        color: #000;
+        z-index: 5;
     }
 
-    /* Post Cards - Image Overlay Style */
+    /* Card Styling */
     .knot-card {
         position: relative;
-        height: 350px;
+        height: 380px;
         background-color: #1a1a1a;
-        border-radius: 20px;
+        border-radius: 18px;
         overflow: hidden;
         margin-bottom: 20px;
-        border: 2px solid #222;
-        transition: transform 0.2s ease, border-color 0.2s;
+        border: 2px solid #252525;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .knot-card:hover {
-        transform: scale(1.02);
+        transform: translateY(-5px);
         border-color: #f0e600;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.5);
     }
     
-    .card-bg {
+    .card-img-box {
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
         background-size: cover;
@@ -135,10 +136,10 @@ st.markdown("""
         z-index: 1;
     }
 
-    .card-overlay {
+    .card-gradient {
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+        background: linear-gradient(to top, rgba(0,0,0,0.95) 15%, rgba(0,0,0,0.2) 60%, transparent 100%);
         z-index: 2;
         padding: 20px;
         display: flex;
@@ -146,168 +147,184 @@ st.markdown("""
         justify-content: flex-end;
     }
 
-    .author-tag {
+    .user-pill {
         display: flex;
-        align-items: center; gap: 8px; background: rgba(0,0,0,0.7);
-        padding: 4px 10px; border-radius: 15px; width: fit-content;
-        margin-bottom: 10px; border: 1px solid #444;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0,0,0,0.75);
+        padding: 5px 12px;
+        border-radius: 20px;
+        width: fit-content;
+        margin-bottom: 12px;
+        border: 1px solid #444;
+        font-size: 0.75rem;
     }
     
-    .avatar-mini {
-        width: 18px; height: 18px; background: #f0e600; border-radius: 50%;
+    .avatar-icon {
+        width: 16px; height: 16px; background: #f0e600; border-radius: 50%;
     }
 
-    .card-title {
-        font-weight: bold; font-size: 1.05rem; line-height: 1.2;
-        margin-bottom: 5px; color: #ffffff;
+    .card-title-text {
+        font-weight: bold; font-size: 1.1rem; line-height: 1.25;
+        margin-bottom: 8px; color: #fff;
     }
-    .card-preview {
-        font-size: 0.8rem; color: #bbb; line-height: 1.3;
-        max-height: 3.9em; overflow: hidden;
+    .card-desc-text {
+        font-size: 0.85rem; color: #aaa; line-height: 1.4;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
 
-    .reply-item {
-        background: #151515; padding: 15px; border-radius: 10px;
-        margin-bottom: 12px; border-left: 4px solid #f0e600;
-        font-family: 'JetBrains Mono', monospace;
+    /* Modal Styling */
+    .modal-overlay {
+        background: #121212;
+        border: 2px solid #333;
+        border-radius: 20px;
+        padding: 25px;
+        position: relative;
+    }
+    
+    .reply-box {
+        background: #181818;
+        border-left: 4px solid #f0e600;
+        padding: 12px 18px;
+        margin-bottom: 10px;
+        border-radius: 0 8px 8px 0;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- NAVIGATION BAR ---
+# --- NAVIGATION LOGIC ---
+def set_filter(category):
+    st.session_state.filter = category
+    st.session_state.active_post_id = None # Return to list when changing categories
+
 st.markdown("""
-    <div class="top-nav">
-        <div class="nav-item active">Notifications</div>
-        <div class="nav-item">Intel Board</div>
-        <div class="nav-item">Schedule</div>
+    <div class="nav-container">
+        <div class="nav-btn active">Notifications</div>
+        <div class="nav-btn">Intel Board</div>
+        <div class="nav-btn">Schedule</div>
     </div>
 """, unsafe_allow_html=True)
 
-# Sub-Category Filter
-filter_cols = st.columns([5, 1, 1, 1])
-with filter_cols[1]:
-    if st.button("All", key="btn_all", use_container_width=True, type="primary" if st.session_state.filter == "All" else "secondary"):
-        st.session_state.filter = "All"
+# Category Jump Buttons
+f_col1, f_col2, f_col3, f_col4 = st.columns([5, 1, 1, 1])
+with f_col2:
+    if st.button("All", use_container_width=True, type="primary" if st.session_state.filter == "All" else "secondary"):
+        set_filter("All")
         st.rerun()
-with filter_cols[2]:
-    if st.button("General", key="btn_gen", use_container_width=True, type="primary" if st.session_state.filter == "General" else "secondary"):
-        st.session_state.filter = "General"
+with f_col3:
+    if st.button("General", use_container_width=True, type="primary" if st.session_state.filter == "General" else "secondary"):
+        set_filter("General")
         st.rerun()
-with filter_cols[3]:
-    if st.button("Help Info", key="btn_help", use_container_width=True, type="primary" if st.session_state.filter == "Help Request Info" else "secondary"):
-        st.session_state.filter = "Help Request Info"
+with f_col4:
+    if st.button("Help Info", use_container_width=True, type="primary" if st.session_state.filter == "Help Request Info" else "secondary"):
+        set_filter("Help Request Info")
         st.rerun()
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- MODAL VIEW (Post Detail) ---
+# --- POST DETAIL VIEW ---
 if st.session_state.active_post_id:
-    post = next((p for p in st.session_state.posts if p["id"] == st.session_state.active_post_id), None)
-    if post:
-        st.markdown("""<div style="background:#111; padding:20px; border-radius:15px; border:1px solid #333;">""", unsafe_allow_html=True)
-        m_col1, m_col2 = st.columns([1.2, 1])
+    # Find post carefully to avoid KeyErrors
+    active_post = next((p for p in st.session_state.posts if p["id"] == st.session_state.active_post_id), None)
+    
+    if active_post:
+        st.markdown('<div class="modal-overlay">', unsafe_allow_html=True)
+        det_col1, det_col2 = st.columns([1.5, 1])
         
-        with m_col1:
-            img_val = post.get("img", "https://picsum.photos/seed/err/800/600")
-            st.image(img_val, use_container_width=True)
-            st.title(post.get("title", "Untitled"))
-            st.write(post.get("content", "No content available."))
-            if st.button("← BACK TO LIST", key="back_btn", use_container_width=True):
+        with det_col1:
+            st.image(active_post.get("img", ""), use_container_width=True)
+            st.title(active_post.get("title", "Untitled"))
+            st.write(active_post.get("content", ""))
+            if st.button("↩ BACK TO FEED", use_container_width=True):
                 st.session_state.active_post_id = None
                 st.rerun()
 
-        with m_col2:
-            replies = post.get('replies', [])
-            st.markdown(f"### 💬 Replies ({len(replies)})")
-            for reply in replies:
+        with det_col2:
+            st.markdown(f"### 💬 Comments")
+            for r in active_post.get("replies", []):
                 st.markdown(f"""
-                    <div class="reply-item">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span style="color:#f0e600; font-weight:bold;">@{reply['user']}</span>
-                            <span style="color:#666; font-size:0.7rem;">Verified Member</span>
-                        </div>
-                        <div style="color:#eee; font-size:0.9rem;">{reply['text']}</div>
+                    <div class="reply-box">
+                        <div style="color:#f0e600; font-size:0.8rem; font-weight:bold; margin-bottom:4px;">@{r['user']}</div>
+                        <div style="font-size:0.9rem;">{r['text']}</div>
                     </div>
                 """, unsafe_allow_html=True)
             
-            with st.form("reply_form", clear_on_submit=True):
-                reply_text = st.text_input("Comment...", placeholder="Type your message here...")
-                if st.form_submit_button("POST REPLY"):
-                    if reply_text:
-                        post["replies"].append({"user": "WebUser_714", "text": reply_text})
-                        st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
+            with st.form("add_reply", clear_on_submit=True):
+                comment_txt = st.text_input("Add a comment...")
+                if st.form_submit_button("SEND") and comment_txt:
+                    active_post["replies"].append({"user": "Operator_01", "text": comment_txt})
+                    st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        st.session_state.active_post_id = None
+        st.rerun()
 
-# --- MAIN GRID ---
-display_posts = st.session_state.posts
-if st.session_state.filter != "All":
-    display_posts = [p for p in st.session_state.posts if p.get("category") == st.session_state.filter]
-
-if not display_posts:
-    st.info(f"No threads found in '{st.session_state.filter}'")
+# --- MAIN LIST VIEW ---
 else:
-    cols = st.columns(3)
-    for idx, post in enumerate(display_posts):
-        post_id = post.get('id', idx)
-        image_url = post.get('img', 'https://picsum.photos/seed/default/800/600')
-        author = post.get('author', 'Unknown')
-        title = post.get('title', 'Untitled Thread')
-        content = post.get('content', '')
-        
-        with cols[idx % 3]:
-            st.markdown(f"""
-                <div class="knot-card">
-                    <div class="card-bg" style="background-image: url('{image_url}');"></div>
-                    <div class="card-overlay">
-                        <div class="author-tag">
-                            <div class="avatar-mini"></div>
-                            <span style="font-size: 0.7rem; font-weight: bold; color: #fff;">{author}</span>
+    # Filter posts based on current selection
+    if st.session_state.filter == "All":
+        filtered_posts = st.session_state.posts
+    else:
+        filtered_posts = [p for p in st.session_state.posts if p["category"] == st.session_state.filter]
+
+    if not filtered_posts:
+        st.info(f"No intelligence found under the '{st.session_state.filter}' filter.")
+    else:
+        grid_cols = st.columns(3)
+        for i, post in enumerate(filtered_posts):
+            p_id = post["id"]
+            with grid_cols[i % 3]:
+                # Card HTML
+                st.markdown(f"""
+                    <div class="knot-card">
+                        <div class="card-img-box" style="background-image: url('{post.get('img', '')}');"></div>
+                        <div class="card-gradient">
+                            <div class="user-pill">
+                                <div class="avatar-icon"></div>
+                                <span>{post.get('author', 'Anon')}</span>
+                            </div>
+                            <div class="card-title-text">{post.get('title', 'No Title')}</div>
+                            <div class="card-desc-text">{post.get('content', '')}</div>
                         </div>
-                        <div class="card-title">{title}</div>
-                        <div class="card-preview">{content[:75]}...</div>
                     </div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            if st.button(f"OPEN THREAD ##{post_id}", key=f"read_{post_id}_{idx}", use_container_width=True):
-                st.session_state.active_post_id = post_id
-                st.rerun()
+                """, unsafe_allow_html=True)
+                
+                # Use a unique key with ID to avoid StreamlitDuplicateElementKey
+                if st.button(f"READ REPORT #{p_id}", key=f"btn_p_{p_id}", use_container_width=True):
+                    st.session_state.active_post_id = p_id
+                    st.rerun()
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown('<h1 style="font-family: Orbitron; color: #f0e600; letter-spacing: 2px;">KNOT-LINK</h1>', unsafe_allow_html=True)
-    st.markdown('<p style="color: #888; font-size: 0.8rem;">ADMINISTRATIVE CONSOLE</p>', unsafe_allow_html=True)
+    st.markdown('<h1 style="font-family: Orbitron; color: #f0e600;">KNOT-LINK</h1>', unsafe_allow_html=True)
+    st.markdown('**NODE STATUS:** <span style="color:#00ff00;">ONLINE</span>', unsafe_allow_html=True)
     st.write("---")
     
-    with st.form("new_post", clear_on_submit=True):
-        st.write("PUBLISH NEW INTEL")
-        new_title = st.text_input("Report Title")
-        new_content = st.text_area("Intel Summary")
-        new_category = st.selectbox("Assign Category", ["General", "Help Request Info"])
-        new_img_keyword = st.text_input("Visual Seed (Keyword)")
-        submitted = st.form_submit_button("BROADCAST")
+    with st.form("broadcast_intel"):
+        st.write("📢 BROADCAST NEW INTEL")
+        b_title = st.text_input("Title")
+        b_cat = st.selectbox("Category", ["General", "Help Request Info"])
+        b_text = st.text_area("Content")
+        b_img = st.text_input("Image Keyword (e.g. city, space, tech)")
         
-        if submitted and new_title:
-            final_img = f"https://picsum.photos/seed/{new_img_keyword}/800/600" if new_img_keyword.strip() else "https://picsum.photos/seed/post/800/600"
-            max_id = max([p["id"] for p in st.session_state.posts]) if st.session_state.posts else 0
-            new_entry = {
-                "id": max_id + 1,
-                "author": "Verified Source",
-                "title": new_title,
-                "content": new_content,
-                "img": final_img,
-                "category": new_category,
-                "replies": []
-            }
-            st.session_state.posts.insert(0, new_entry)
-            st.rerun()
-
+        if st.form_submit_button("TRANSMIT"):
+            if b_title and b_text:
+                new_id = int(time.time())
+                img_url = f"https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800"
+                if b_img:
+                    img_url = f"https://picsum.photos/seed/{b_img}/800/600"
+                
+                new_post = {
+                    "id": new_id,
+                    "author": "Current_Operator",
+                    "title": f"[Alert] {b_title}",
+                    "content": b_text,
+                    "img": img_url,
+                    "category": b_cat,
+                    "replies": []
+                }
+                st.session_state.posts.insert(0, new_post)
+                st.rerun()
+    
     st.write("---")
-    st.markdown(f"""
-        <div style="background: #111; padding: 15px; border-radius: 10px; border: 1px solid #333;">
-            <div style="font-size: 0.7rem; color: #666;">LOGGED AS</div>
-            <div style="color: #f0e600; font-weight: bold; font-family: Orbitron;">ANONYMOUS_OPERATOR</div>
-            <div style="font-size: 0.7rem; color: #00ff00; margin-top: 5px;">● ENCRYPTION ACTIVE</div>
-        </div>
-    """, unsafe_allow_html=True)
+    st.caption("Ver. 2.5.0-GLOBAL")
