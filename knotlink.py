@@ -126,7 +126,7 @@ st.markdown("""
     </div>
     <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 40px;">
         <span style="background: #f0e600; color: black; padding: 2px 15px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">All</span>
-        <span style="color: white; font-size: 0.7rem; padding: 2px 10px;">General</span>
+        <span style="color: white; font-size: 0.7rem; padding: 2px 10px;">News</span>
         <span style="color: white; font-size: 0.7rem; padding: 2px 10px;">Help Request Info</span>
     </div>
 """, unsafe_allow_html=True)
@@ -135,45 +135,45 @@ st.markdown("""
 if 'posts' not in st.session_state:
     st.session_state.posts = [
         {
-            "author": "MetisIntelligence",
-            "title": "[Post] Vision's shocking scandal exposed — Perlman is going to jail!",
-            "content": "Charles Perlman, chief executive of Vision Corp, was caught in a multi-level fraud scheme...",
-            "img": "https://picsum.photos/seed/vision/400/300",
+            "author": "r/politics",
+            "title": "Trump issues warning to Iran",
+            "content": "Trump Vows To Strike Civilian Infrastructure...",
+            "img": "https://picsum.photos/seed/trump/400/300",
             "timestamp": time.time()
         },
         {
-            "author": "Worrybot",
-            "title": "A new Hollow on Fourteenth Street!",
-            "content": "A Companion Hollow has appeared. Residents are advised to seek shelter immediately.",
-            "img": "https://picsum.photos/seed/hollow/400/300",
+            "author": "r/worldnews",
+            "title": "US rescues missing pilot",
+            "content": "U.S. forces rescue second crew member...",
+            "img": "https://picsum.photos/seed/pilot/400/300",
             "timestamp": time.time() - 3600
         },
         {
-            "author": "Friend2Proxy",
-            "title": "[Info] Proxy Must-Knows: Carrots",
-            "content": "Investigators and Proxies often overlook the importance of specialized carrot data in grid navigation.",
-            "img": "https://picsum.photos/seed/carrot/400/300",
+            "author": "r/spaceporn",
+            "title": "New Artemis II photos",
+            "content": "New Image from NASA: For the first tim...",
+            "img": None, # Black out example as per previous instruction
             "timestamp": time.time() - 7200
         },
         {
-            "author": "Anonymous",
-            "title": "[Warning] Beware of the Proxy called Freeman's Antlers",
-            "content": "What a pain! This Proxy has been stealing commissions in the Lumina Square area.",
-            "img": None, # Black out example
+            "author": "r/Music",
+            "title": "Pepsi pulls out of Wi...",
+            "content": "Pepsi Cancels Sponsorship c...",
+            "img": "https://picsum.photos/seed/pepsi/400/300",
             "timestamp": time.time() - 10000
         },
         {
-            "author": "QuQ",
-            "title": "[Question] How to quickly level up your IK account?",
-            "content": "See title - I just started and I want to reach the legendary rank as fast as possible.",
-            "img": "https://picsum.photos/seed/question/400/300",
+            "author": "MetisIntelligence",
+            "title": "[News] Vision's shocking scandal exposed",
+            "content": "Charles Perlman, chief executive of Vision Corp, was caught in a fraud scheme...",
+            "img": "https://picsum.photos/seed/vision/400/300",
             "timestamp": time.time() - 15000
         },
         {
-            "author": "gawadaw",
-            "title": "[Post] Some long-lost dimensions",
-            "content": "Does anyone remember the sector that used to be near the old railway? It's completely gone now.",
-            "img": None, # Black out example
+            "author": "Hollow_Rabbit",
+            "title": "Anyone seen a runaway 'Security' Bangboo?",
+            "content": "Lost my modified Butler unit in the back alleys of 6th Street. Reward: Noodle Box.",
+            "img": None, 
             "timestamp": time.time() - 20000
         }
     ]
@@ -182,7 +182,6 @@ if 'posts' not in st.session_state:
 cols = st.columns(3)
 
 for idx, post in enumerate(st.session_state.posts):
-    # Logic: if 'img' is None or empty, we don't set a background-image URL
     image_url = post.get('img')
     image_style = f"background-image: url('{image_url}');" if image_url else ""
     
@@ -213,7 +212,6 @@ with st.sidebar:
         submitted = st.form_submit_button("PUBLISH")
         
         if submitted and new_title:
-            # Only create an image URL if a keyword was provided
             final_img = f"https://picsum.photos/seed/{new_img_seed}/400/300" if new_img_seed.strip() else None
             
             new_post = {
