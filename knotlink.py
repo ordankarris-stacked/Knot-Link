@@ -4,17 +4,17 @@ import random
 
 # --- UI CONFIGURATION ---
 st.set_page_config(
-    page_title="Knot-Link // Proxy Network",
+    page_title="Knot-Link // Tech Network",
     page_icon="🕸️",
     layout="wide",
 )
 
-# --- CUSTOM CSS (ZZZ AESTHETIC REPLICATION) ---
+# --- CUSTOM CSS (HIGH-CONTRAST TECH AESTHETIC) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap');
 
-    /* Main Background with Diagonal Stripes */
+    /* Main Background */
     .stApp {
         background-color: #000000;
         background-image: radial-gradient(circle at 2px 2px, #111 1px, transparent 0);
@@ -23,7 +23,7 @@ st.markdown("""
         font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Top Left Title Branding - Enhanced ZZZ Style */
+    /* Top Left Title Branding */
     .brand-container {
         display: flex;
         align-items: center;
@@ -69,7 +69,7 @@ st.markdown("""
         color: #000000 !important;
     }
 
-    /* Sub-tabs Styling (Yellow Pill shape for active) */
+    /* Sub-tabs Styling */
     .stButton > button {
         border-radius: 20px !important;
         text-transform: uppercase !important;
@@ -78,7 +78,6 @@ st.markdown("""
         transition: 0.2s all !important;
     }
     
-    /* Force primary button to be the signature yellow */
     button[kind="primary"] {
         background-color: #E2FF00 !important;
         color: black !important;
@@ -91,7 +90,7 @@ st.markdown("""
         border: none !important;
     }
 
-    /* Vertical Card Style (Zenless Zone Zero Style) */
+    /* Vertical Card Style */
     .card-container {
         background-color: #111111;
         border-radius: 20px;
@@ -191,38 +190,38 @@ if "posts" not in st.session_state:
     st.session_state.posts = [
         {
             "id": 101,
-            "author": "MetisIntel", 
-            "title": "[Post] Vision's shocking scandal exposed — Perlman is going to jail!", 
-            "content": "Charles Perlman, chief of logistics, has been found guilty of misusing Ether resources in the Sixth Street sector. Evidence of corruption has finally surfaced after months of internal investigation.",
+            "author": "TechWatch", 
+            "title": "[News] Major Data Breach at Global Logistics Firm Exposed", 
+            "content": "A high-profile logistics provider has confirmed a significant data leak affecting millions of records. Security experts suggest the breach originated from an unpatched SQL vulnerability in their regional server hub.",
             "faction": "General", 
-            "image": "https://images.unsplash.com/photo-1514467950401-6d88ff3f1cce?auto=format&fit=crop&q=80&w=400",
-            "replies": [{"author": "StreetSmart", "text": "Finally some justice."}, {"author": "Worrybot", "text": "Delivery routes?"}]
+            "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=400",
+            "replies": [{"author": "DevOps_Dan", "text": "This is why we patch on day one."}, {"author": "SysAdmin_Joe", "text": "Check your API keys, everyone."}]
         },
         {
             "id": 102,
-            "author": "Worrybot", 
-            "title": "A new Hollow on Fourteenth Street!", 
-            "content": "A Companion Hollow has manifested near the residential district. High ether concentration detected. Avoid the subway entrance until the E.P.S. issues a clear notice.",
+            "author": "CloudTracker", 
+            "title": "AWS Outage Hits US-East-1 Region", 
+            "content": "Multiple services are reporting downtime as AWS investigates connectivity issues in Northern Virginia. Developers are advised to check multi-region failover configurations.",
             "faction": "General", 
-            "image": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&q=80&w=400",
+            "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=400",
             "replies": []
         },
         {
             "id": 103,
-            "author": "Friend2Proxies", 
-            "title": "[Info] Proxy Must-Knows: Carrots", 
-            "content": "Investigators and Proxies alike: remember that Carrots are your lifeline. Don't rely on outdated grid maps when the Hollow is shifting rapidly.",
-            "faction": "Help Info", 
-            "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=400",
+            "author": "SecureRoot", 
+            "title": "[Info] Essential 2FA Best Practices for 2024", 
+            "content": "Stop using SMS-based authentication. Hardware security keys and authenticator apps are the current standard for securing critical accounts against social engineering.",
+            "faction": "Tech Support", 
+            "image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=400",
             "replies": []
         },
         {
             "id": 104,
-            "author": "Anonymous", 
-            "title": "[Warning] Beware of Freeman's Antlers", 
-            "content": "What a pain! This Proxy has been leading teams into high-hazard zones without proper equipment. Steer clear if you value your life.",
+            "author": "NetRunner", 
+            "title": "[Warning] New Phishing Campaign Mimicking IT Support", 
+            "content": "Users are reporting sophisticated emails that perfectly mirror internal IT tickets. Do not click links asking for credential verification without calling the desk directly.",
             "faction": "General", 
-            "image": "https://images.unsplash.com/photo-1614728263952-84ea256f9679?auto=format&fit=crop&q=80&w=400",
+            "image": "https://images.unsplash.com/photo-1510511459019-5dee997dd1db?auto=format&fit=crop&q=80&w=400",
             "replies": []
         }
     ]
@@ -242,15 +241,14 @@ with header_col2:
     st.markdown("""
         <div class="nav-container">
             <div class="nav-btn">Notifications</div>
-            <div class="nav-btn nav-btn-active">Intel Board</div>
-            <div class="nav-btn">Schedule</div>
+            <div class="nav-btn nav-btn-active">Tech Board</div>
+            <div class="nav-btn">Hardware</div>
         </div>
     """, unsafe_allow_html=True)
 
 # --- FILTER TABS ---
-# Sub-tabs styling with yellow pill for active state
 tab_cols = st.columns([0.8, 1, 1.2, 5])
-filters = ["All", "General", "Help Info"]
+filters = ["All", "General", "Tech Support"]
 
 for idx, f_name in enumerate(filters):
     with tab_cols[idx]:
@@ -264,21 +262,21 @@ st.write("")
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("### 🛰️ TRANSMISSION")
-    st.markdown(f"**Logon:** <span style='color:#E2FF00;'>Anonymous User</span>", unsafe_allow_html=True)
+    st.markdown("### 🛰️ NETWORK UPLINK")
+    st.markdown(f"**Logon:** <span style='color:#E2FF00;'>Verified User</span>", unsafe_allow_html=True)
     st.write("---")
-    new_title = st.text_input("Signal Title", placeholder="e.g. [Question] Leveling up...")
-    new_content = st.text_area("Signal Body", placeholder="Broadcast a message...")
-    post_category = st.selectbox("Frequency", ["General", "Help Info"])
-    if st.button("SEND SIGNAL", use_container_width=True, type="primary"):
+    new_title = st.text_input("Post Title", placeholder="Subject line...")
+    new_content = st.text_area("Message Body", placeholder="Share technical data...")
+    post_category = st.selectbox("Category", ["General", "Tech Support"])
+    if st.button("BROADCAST", use_container_width=True, type="primary"):
         if new_content.strip() and new_title.strip():
             st.session_state.posts.insert(0, {
                 "id": random.randint(1000, 9999),
-                "author": "Anonymous User",
+                "author": "Verified User",
                 "title": new_title,
                 "content": new_content,
                 "faction": post_category,
-                "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=400",
+                "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=400",
                 "replies": []
             })
             st.rerun()
@@ -294,7 +292,7 @@ if st.session_state.selected_post:
     st.title(post.get('title', "Untitled Signal"))
     st.write(post.get('content', ""))
     st.write("---")
-    st.subheader("Replies")
+    st.subheader("Community Discussions")
     for r in post.get('replies', []):
         st.markdown(f"**{r.get('author', '??')}**: {r.get('text', '')}")
 
@@ -304,18 +302,16 @@ else:
     if st.session_state.current_filter != "All":
         display_posts = [p for p in st.session_state.posts if p.get('faction') == st.session_state.current_filter]
 
-    # Calculate rows (4 columns grid)
     rows = [display_posts[i:i + 4] for i in range(0, len(display_posts), 4)]
     
     for row in rows:
         cols = st.columns(4)
         for idx, post in enumerate(row):
-            # SAFE DATA ACCESS to prevent KeyError crashes
             p_id = post.get('id', random.randint(0, 9999))
             img_url = post.get('image', "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400")
-            p_title = post.get('title', "Untitled Signal")
+            p_title = post.get('title', "Untitled Post")
             p_author = post.get('author', "Unknown")
-            p_content = post.get('content', "Signal strength confirmed. Welcome to the Node.")
+            p_content = post.get('content', "No further details available for this log.")
 
             with cols[idx]:
                 st.markdown(f"""
@@ -327,13 +323,12 @@ else:
                             </div>
                         </div>
                         <div class="card-footer">
-                            <div class="author-avatar">🕶️</div>
+                            <div class="author-avatar">💻</div>
                             <div class="author-name">{p_author}</div>
                         </div>
                     </div>
                 """, unsafe_allow_html=True)
                 
-                # Use a specific key to ensure uniqueness
-                if st.button(f"OPEN INTEL #{p_id}", key=f"btn_view_{p_id}", use_container_width=True):
+                if st.button(f"DETAILS #{p_id}", key=f"btn_view_{p_id}", use_container_width=True):
                     st.session_state.selected_post = post
                     st.rerun()
