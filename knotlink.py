@@ -9,171 +9,215 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS to force the ZZZ aesthetic onto Streamlit components
+# Custom CSS for the Masonry Grid and Game UI look
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700&display=swap');
     
     /* Main Background */
     .stApp {
-        background-color: #0a0a0a;
-        color: #e0e0e0;
+        background-color: #0d0d0d;
+        color: #ffffff;
         font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Header Styling */
-    .header-text {
-        font-family: 'Orbitron', sans-serif;
-        color: #ff6b00;
-        letter-spacing: -1px;
+    /* Top Navigation Bar */
+    .top-nav {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 30px;
+        padding-top: 10px;
+    }
+    .nav-item {
+        background: #1a1a1a;
+        color: #ffffff;
+        padding: 8px 30px;
+        border-radius: 20px;
+        font-weight: bold;
         text-transform: uppercase;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border: 1px solid #333;
+    }
+    .nav-item.active {
+        background: #f0e600; /* ZZZ Yellow */
+        color: #000000;
+        border: none;
     }
 
-    /* Post Cards */
+    /* Post Cards - Grid Style */
     .knot-card {
         background-color: #1a1a1a;
-        border-left: 4px solid #333;
-        padding: 20px;
-        margin-bottom: 15px;
-        transition: 0.2s;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        border: 1px solid #222;
+        transition: transform 0.2s ease;
     }
     .knot-card:hover {
-        border-left-color: #ff6b00;
-        background-color: #222;
-    }
-
-    /* Status Tags */
-    .status-tag {
-        font-size: 0.7rem;
-        padding: 2px 8px;
-        text-transform: uppercase;
-        border: 1px solid #ff6b00;
-        color: #ff6b00;
-        border-radius: 2px;
-    }
-
-    /* Fairy Eye Animation */
-    .fairy-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-    .fairy-eye {
-        width: 12px;
-        height: 12px;
-        background: #ff6b00;
-        border-radius: 50%;
-        box-shadow: 0 0 10px #ff6b00;
-        animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.3; }
-        100% { opacity: 1; }
+        transform: translateY(-5px);
+        border-color: #f0e600;
     }
     
-    /* Input Overrides */
-    .stTextArea textarea, .stTextInput input {
-        background-color: #111 !important;
-        color: white !important;
-        border: 1px solid #333 !important;
+    .card-image {
+        width: 100%;
+        height: 180px;
+        background-size: cover;
+        background-position: center;
+        border-bottom: 1px solid #222;
+    }
+
+    .card-content {
+        padding: 15px;
+    }
+
+    .author-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+    .avatar {
+        width: 24px;
+        height: 24px;
+        background: #333;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        border: 1px solid #444;
+    }
+
+    .card-title {
+        font-weight: bold;
+        font-size: 1rem;
+        line-height: 1.2;
+        margin-bottom: 8px;
+        color: #eee;
+    }
+    .card-preview {
+        font-size: 0.8rem;
+        color: #888;
+        line-height: 1.4;
+    }
+
+    /* Fairy / Status Bar */
+    .status-bar {
+        background: #000;
+        padding: 5px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #222;
+        margin-bottom: 20px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- SESSION STATE (MOCK DATABASE) ---
+# --- TOP NAVIGATION BAR ---
+st.markdown("""
+    <div class="top-nav">
+        <div class="nav-item active">Notifications</div>
+        <div class="nav-item">Intel Board</div>
+        <div class="nav-item">Schedule</div>
+    </div>
+    <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 40px;">
+        <span style="background: #f0e600; color: black; padding: 2px 15px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">All</span>
+        <span style="color: white; font-size: 0.7rem; padding: 2px 10px;">Fairy Picks</span>
+        <span style="color: white; font-size: 0.7rem; padding: 2px 10px;">Help Request Info</span>
+    </div>
+""", unsafe_allow_html=True)
+
+# --- SESSION STATE ---
 if 'posts' not in st.session_state:
     st.session_state.posts = [
         {
-            "author": "Neon_Caster",
-            "title": "Signal interference near the Construction Hub",
-            "content": "Heads up. My sync rates dropped by 15% near the old crane. Might be an Ether-dense pocket forming or just H.A.N.D. jamming signals again.",
-            "tags": ["Intel", "Safety"],
+            "author": "MetisIntelligence",
+            "title": "[Post] Vision's shocking scandal exposed — Perlman is going to jail!",
+            "content": "Charles Perlman, chief executive of Vision Corp, was caught in a multi-level fraud scheme...",
+            "img": "https://picsum.photos/seed/vision/400/300",
             "timestamp": time.time()
         },
         {
-            "author": "Hollow_Rabbit",
-            "title": "Anyone seen a runaway 'Security' Bangboo?",
-            "content": "Lost my modified Butler unit in the back alleys of 6th Street. It has a red scarf and answers to 'Binky'. Reward: One box of premium noodles.",
-            "tags": ["Help", "Bangboo"],
+            "author": "Worrybot",
+            "title": "A new Hollow on Fourteenth Street!",
+            "content": "A Companion Hollow has appeared. Residents are advised to seek shelter immediately.",
+            "img": "https://picsum.photos/seed/hollow/400/300",
+            "timestamp": time.time() - 3600
+        },
+        {
+            "author": "Friend2Proxy",
+            "title": "[Info] Proxy Must-Knows: Carrots",
+            "content": "Investigators and Proxies often overlook the importance of specialized carrot data in grid navigation.",
+            "img": "https://picsum.photos/seed/carrot/400/300",
             "timestamp": time.time() - 7200
         },
         {
-            "author": "Ether_Diver_Zero",
-            "title": "The rumor about the 'White Room' is real.",
-            "content": "Found a localized distortion that doesn't show up on any Proxy map. It was completely silent inside. If you see a glitching vending machine, don't touch it.",
-            "tags": ["Rumor", "Intel"],
+            "author": "Anonymous",
+            "title": "[Warning] Beware of the Proxy called Freeman's Antlers",
+            "content": "What a pain! This Proxy has been stealing commissions in the Lumina Square area.",
+            "img": "https://picsum.photos/seed/warning/400/300",
+            "timestamp": time.time() - 10000
+        },
+        {
+            "author": "QuQ",
+            "title": "[Question] How to quickly level up your IK account?",
+            "content": "See title - I just started and I want to reach the legendary rank as fast as possible.",
+            "img": "https://picsum.photos/seed/question/400/300",
             "timestamp": time.time() - 15000
+        },
+        {
+            "author": "gawadaw",
+            "title": "[Post] Some long-lost dimensions",
+            "content": "Does anyone remember the sector that used to be near the old railway? It's completely gone now.",
+            "img": "https://picsum.photos/seed/dimension/400/300",
+            "timestamp": time.time() - 20000
         }
     ]
 
-# --- SIDEBAR ---
+# --- MAIN GRID ---
+cols = st.columns(3)
+
+for idx, post in enumerate(st.session_state.posts):
+    with cols[idx % 3]:
+        st.markdown(f"""
+            <div class="knot-card">
+                <div class="card-image" style="background-image: url('{post['img']}');"></div>
+                <div class="card-content">
+                    <div class="author-info">
+                        <div class="avatar">👤</div>
+                        <span style="font-size: 0.75rem; font-weight: bold; color: #aaa;">{post['author']}</span>
+                    </div>
+                    <div class="card-title">{post['title']}</div>
+                    <div class="card-preview">{post['content'][:80]}...</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
+# --- POSTING INTERFACE (FLOATING ACTION) ---
 with st.sidebar:
-    st.markdown("""
-        <div class="fairy-container">
-            <div class="fairy-eye"></div>
-            <h2 class="header-text" style="font-size: 1.5rem; margin: 0;">KNOT-LINK</h2>
-        </div>
-    """, unsafe_allow_html=True)
-    
+    st.markdown('<h2 class="header-text">KNOT-LINK</h2>', unsafe_allow_html=True)
     st.write("---")
-    st.button("🌐 Proxy Lounge", use_container_width=True)
-    st.button("📡 Intel Sharing", use_container_width=True)
-    st.button("⚙️ Gear Talk", use_container_width=True)
-    st.button("🔍 Rumor Mill", use_container_width=True)
-    
-    st.write("---")
-    st.caption("LOGGED IN AS")
-    st.subheader("PHAETHON")
-    st.success("● SECURE CONNECTION")
-
-# --- MAIN CONTENT ---
-st.markdown('<h1 class="header-text">KNOT-LINK // Proxy Lounge</h1>', unsafe_allow_html=True)
-st.caption("// Secure communication channel for verified Proxy operators.")
-
-# Posting Interface
-with st.expander("➕ START NEW THREAD", expanded=False):
-    with st.form("new_post_form", clear_on_submit=True):
-        title = st.text_input("Thread Title", placeholder="Enter a descriptive title...")
-        content = st.text_area("Content", placeholder="Share your intel...")
-        tags = st.multiselect("Tags", ["Intel", "Safety", "Help", "Bangboo", "General", "Rumor"], default=["General"])
-        submit = st.form_submit_button("TRANSMIT TO KNOT-LINK")
+    with st.form("new_post", clear_on_submit=True):
+        st.write("Create New Thread")
+        new_title = st.text_input("Title")
+        new_content = st.text_area("Description")
+        new_img_seed = st.text_input("Image Keyword", "tech")
+        submitted = st.form_submit_button("PUBLISH")
         
-        if submit and title and content:
-            new_entry = {
+        if submitted and new_title:
+            new_post = {
                 "author": "PHAETHON",
-                "title": title,
-                "content": content,
-                "tags": tags,
+                "title": new_title,
+                "content": new_content,
+                "img": f"https://picsum.photos/seed/{new_img_seed}/400/300",
                 "timestamp": time.time()
             }
-            st.session_state.posts.insert(0, new_entry)
+            st.session_state.posts.insert(0, new_post)
             st.rerun()
 
-st.write("") # Spacer
-
-# Feed Rendering
-for post in st.session_state.posts:
-    dt_object = datetime.fromtimestamp(post['timestamp']).strftime('%Y-%m-%d %H:%M')
-    
-    # HTML template for each post card
-    tags_html = "".join([f'<span class="status-tag" style="margin-left:5px">{tag}</span>' for tag in post['tags']])
-    
-    st.markdown(f"""
-        <div class="knot-card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 24px; height: 24px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ff6b00; font-size: 10px; border: 1px solid #ff6b00;">P</div>
-                    <span style="color: #ff6b00; font-weight: bold; font-size: 0.8rem;">@{post['author']}</span>
-                </div>
-                <div>{tags_html}</div>
-            </div>
-            <h3 style="margin: 10px 0 5px 0;">{post['title']}</h3>
-            <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 15px;">{post['content']}</p>
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #555; border-top: 1px solid #333; pt-10px; margin-top: 10px;">
-                <div>Like • Reply • Share</div>
-                <div style="font-style: italic;">{dt_object} // VERIFIED_ENTRY</div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+    st.write("---")
+    st.caption("Logged in: PHAETHON")
+    st.success("SYNC: ACTIVE")
