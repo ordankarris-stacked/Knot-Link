@@ -66,6 +66,7 @@ st.markdown("""
         background-size: cover;
         background-position: center;
         border-bottom: 1px solid #222;
+        background-color: #000; /* Black out fallback */
     }
 
     .card-content {
@@ -158,7 +159,7 @@ if 'posts' not in st.session_state:
             "author": "Anonymous",
             "title": "[Warning] Beware of the Proxy called Freeman's Antlers",
             "content": "What a pain! This Proxy has been stealing commissions in the Lumina Square area.",
-            "img": "https://picsum.photos/seed/warning/400/300",
+            "img": None, # Black out example
             "timestamp": time.time() - 10000
         },
         {
@@ -172,7 +173,7 @@ if 'posts' not in st.session_state:
             "author": "gawadaw",
             "title": "[Post] Some long-lost dimensions",
             "content": "Does anyone remember the sector that used to be near the old railway? It's completely gone now.",
-            "img": "https://picsum.photos/seed/dimension/400/300",
+            "img": None, # Black out example
             "timestamp": time.time() - 20000
         }
     ]
@@ -181,13 +182,14 @@ if 'posts' not in st.session_state:
 cols = st.columns(3)
 
 for idx, post in enumerate(st.session_state.posts):
-    # Fix for KeyError: Provide a default image if 'img' key is missing
-    image_url = post.get('img', 'https://picsum.photos/seed/default/400/300')
+    # Logic: if 'img' is None or empty, we don't set a background-image URL
+    image_url = post.get('img')
+    image_style = f"background-image: url('{image_url}');" if image_url else ""
     
     with cols[idx % 3]:
         st.markdown(f"""
             <div class="knot-card">
-                <div class="card-image" style="background-image: url('{image_url}');"></div>
+                <div class="card-image" style="{image_style}"></div>
                 <div class="card-content">
                     <div class="author-info">
                         <div class="avatar">👤</div>
@@ -207,15 +209,18 @@ with st.sidebar:
         st.write("Create New Thread")
         new_title = st.text_input("Title")
         new_content = st.text_area("Description")
-        new_img_seed = st.text_input("Image Keyword", "tech")
+        new_img_seed = st.text_input("Image Keyword (Leave blank for no image)", "")
         submitted = st.form_submit_button("PUBLISH")
         
         if submitted and new_title:
+            # Only create an image URL if a keyword was provided
+            final_img = f"https://picsum.photos/seed/{new_img_seed}/400/300" if new_img_seed.strip() else None
+            
             new_post = {
                 "author": "PHAETHON",
                 "title": new_title,
                 "content": new_content,
-                "img": f"https://picsum.photos/seed/{new_img_seed}/400/300",
+                "img": final_img,
                 "timestamp": time.time()
             }
             st.session_state.posts.insert(0, new_post)
