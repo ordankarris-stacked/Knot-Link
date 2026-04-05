@@ -92,6 +92,9 @@ st.markdown("""
         display: flex;
         align-items: flex-end;
         padding: 10px;
+        /* Blackout effect for missing images */
+        background-color: #050505; 
+        border-bottom: 1px solid #1A1A1A;
     }
 
     .card-footer {
@@ -105,6 +108,9 @@ st.markdown("""
         align-items: center;
         gap: 8px;
         margin-bottom: 10px;
+        background: rgba(0,0,0,0.5);
+        padding: 4px 8px;
+        border-radius: 10px;
     }
 
     .author-avatar {
@@ -126,6 +132,7 @@ st.markdown("""
         font-size: 15px;
         line-height: 1.2;
         margin-bottom: 5px;
+        color: #FFFFFF;
     }
 
     .post-content {
@@ -138,7 +145,7 @@ st.markdown("""
     }
 
     /* Input Styling */
-    .stTextArea textarea {
+    .stTextArea textarea, .stTextInput input {
         background-color: #0A0A0A !important;
         color: white !important;
         border: 1px solid #333 !important;
@@ -159,12 +166,12 @@ st.markdown("""
 # --- SESSION STATE INITIALIZATION ---
 if "posts" not in st.session_state:
     st.session_state.posts = [
-        {"author": "Ghost_In_The_Hollow", "title": "[Notice] Vision's shocking scandal exposed!", "content": "Evidence of corruption in the Sixth Street sector has surfaced...", "faction": "Legendary Proxy", "color": "#2c3e50"},
-        {"author": "Ether_Drifter", "title": "A new Hollow on Fourteenth Street!", "content": "High ether concentration detected. Avoid the subway entrance.", "faction": "Pathfinder", "color": "#1a1a1a"},
-        {"author": "Neon_Rabbit", "title": "[Question] Proxy Must-Knows: Carrots", "content": "How do you navigate the shifting grid patterns efficiently?", "faction": "Hearsay Hunter", "color": "#d35400"},
-        {"author": "MetisIntel", "title": "The Red Fang Gang's doomsday?!", "content": "Internal power struggles are tearing the faction apart.", "faction": "Intel Node", "color": "#27ae60"},
-        {"author": "Worrybot", "title": "[Info] Beware of 'Freeman's Antlers'", "content": "Reports of a dangerous entity roaming the zero zone.", "faction": "Alert Bot", "color": "#c0392b"},
-        {"author": "QuQ", "title": "How to quickly level up IK account?", "content": "Beginner guide for new Proxies hitting New Eridu.", "faction": "Guide", "color": "#8e44ad"}
+        {"author": "Ghost_In_The_Hollow", "title": "[Notice] Vision's shocking scandal exposed!", "content": "Evidence of corruption in the Sixth Street sector has surfaced...", "faction": "Legendary Proxy", "image": None},
+        {"author": "Ether_Drifter", "title": "A new Hollow on Fourteenth Street!", "content": "High ether concentration detected. Avoid the subway entrance.", "faction": "Pathfinder", "image": None},
+        {"author": "Neon_Rabbit", "title": "[Question] Proxy Must-Knows: Carrots", "content": "How do you navigate the shifting grid patterns efficiently?", "faction": "Hearsay Hunter", "image": None},
+        {"author": "MetisIntel", "title": "The Red Fang Gang's doomsday?!", "content": "Internal power struggles are tearing the faction apart.", "faction": "Intel Node", "image": None},
+        {"author": "Worrybot", "title": "[Info] Beware of 'Freeman's Antlers'", "content": "Reports of a dangerous entity roaming the zero zone.", "faction": "Alert Bot", "image": None},
+        {"author": "QuQ", "title": "How to quickly level up IK account?", "content": "Beginner guide for new Proxies hitting New Eridu.", "faction": "Guide", "image": None}
     ]
 
 if "user_id" not in st.session_state:
@@ -180,7 +187,7 @@ st.markdown("""
     </div>
     <div class="sub-nav-container">
         <div class="sub-nav-item sub-nav-active">All</div>
-        <div class="sub-nav-item">Fairy Picks</div>
+        <div class="sub-nav-item">General</div>
         <div class="sub-nav-item">Help Request Info</div>
     </div>
 """, unsafe_allow_html=True)
@@ -198,7 +205,7 @@ with st.sidebar:
                 "title": new_title,
                 "content": new_post,
                 "faction": "Active Proxy",
-                "color": "#333333"
+                "image": None
             }
             st.session_state.posts.insert(0, entry)
             st.rerun()
@@ -208,15 +215,18 @@ cols = st.columns(3)
 
 for idx, post in enumerate(st.session_state.posts):
     col_idx = idx % 3
-    # Use .get() to avoid KeyError if 'color' is missing from old session data
-    bg_color = post.get('color', '#1a1a1a')
+    
+    # Image logic: If image exists use it, otherwise use 'blackout' styling
+    img_url = post.get('image')
+    bg_style = f"background-image: url('{img_url}');" if img_url else "background-color: #050505;"
+    
     with cols[col_idx]:
         st.markdown(f"""
             <div class="card-container">
-                <div class="card-image" style="background-color: {bg_color};">
+                <div class="card-image" style="{bg_style}">
                     <div class="author-badge">
                         <div class="author-avatar"></div>
-                        <span class="author-name">{post['author']}</span>
+                        <span class="author-name">{post.get('author', 'Unknown')}</span>
                     </div>
                 </div>
                 <div class="card-footer">
