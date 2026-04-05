@@ -4,7 +4,7 @@ from datetime import datetime
 
 # --- CONFIGURATION & THEMING ---
 st.set_page_config(
-    page_title="KNOT-LINK // PHAETHON GATEWAY",
+    page_title="KNOT-LINK // GATEWAY",
     page_icon="🟠",
     layout="wide"
 )
@@ -17,7 +17,7 @@ if 'active_post_id' not in st.session_state:
     st.session_state.active_post_id = None
 
 if 'posts' not in st.session_state:
-    # Categories: "General", "Fairy Picks", "Help Request Info"
+    # Categories: "General", "Help Request Info"
     st.session_state.posts = [
         {
             "id": 1,
@@ -34,7 +34,7 @@ if 'posts' not in st.session_state:
             "title": "[Commission] Obsidian: Strategic Eradication",
             "content": "Hollow activity has drastically diminished. Maximum alert level has now been temporarily lifted! I am the captain of a mercenary troupe hired by Obsidian Division...",
             "img": "https://picsum.photos/seed/obsidian/800/600",
-            "category": "Fairy Picks",
+            "category": "General",
             "replies": [
                 {"user": "Kitty_Freak", "text": "That's terrifying... I'm keeping well away from the Hollows for now!"},
                 {"user": "Fantastical_Balut", "text": "There's no room for argument with Obsidian Division... *sigh*"},
@@ -50,15 +50,6 @@ if 'posts' not in st.session_state:
             "img": "https://picsum.photos/seed/hollow/800/600",
             "category": "General",
             "replies": []
-        },
-        {
-            "id": 4,
-            "author": "Friend2Proxies",
-            "title": "[Info] Proxy Must-Knows: Carrots",
-            "content": "Investigators and Proxies alike should pay attention to the new distribution of 'Carrots' in the upcoming sector.",
-            "img": "https://picsum.photos/seed/carrots/800/600",
-            "category": "Fairy Picks",
-            "replies": [{"user": "StarGazer", "text": "Useful intel, thanks!"}]
         },
         {
             "id": 5,
@@ -156,44 +147,27 @@ st.markdown("""
 
     .author-tag {
         display: flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(0,0,0,0.7);
-        padding: 4px 10px;
-        border-radius: 15px;
-        width: fit-content;
-        margin-bottom: 10px;
-        border: 1px solid #444;
+        align-items: center; gap: 8px; background: rgba(0,0,0,0.7);
+        padding: 4px 10px; border-radius: 15px; width: fit-content;
+        margin-bottom: 10px; border: 1px solid #444;
     }
     
     .avatar-mini {
-        width: 18px;
-        height: 18px;
-        background: #f0e600;
-        border-radius: 50%;
+        width: 18px; height: 18px; background: #f0e600; border-radius: 50%;
     }
 
     .card-title {
-        font-weight: bold;
-        font-size: 1.05rem;
-        line-height: 1.2;
-        margin-bottom: 5px;
-        color: #ffffff;
+        font-weight: bold; font-size: 1.05rem; line-height: 1.2;
+        margin-bottom: 5px; color: #ffffff;
     }
     .card-preview {
-        font-size: 0.8rem;
-        color: #bbb;
-        line-height: 1.3;
-        max-height: 3.9em;
-        overflow: hidden;
+        font-size: 0.8rem; color: #bbb; line-height: 1.3;
+        max-height: 3.9em; overflow: hidden;
     }
 
     .reply-item {
-        background: #151515;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 12px;
-        border-left: 4px solid #f0e600;
+        background: #151515; padding: 15px; border-radius: 10px;
+        margin-bottom: 12px; border-left: 4px solid #f0e600;
         font-family: 'JetBrains Mono', monospace;
     }
     </style>
@@ -209,7 +183,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Sub-Category Filter
-filter_cols = st.columns([4, 1, 1, 1.2, 1.2])
+filter_cols = st.columns([5, 1, 1, 1])
 with filter_cols[1]:
     if st.button("All", key="btn_all", use_container_width=True, type="primary" if st.session_state.filter == "All" else "secondary"):
         st.session_state.filter = "All"
@@ -219,11 +193,6 @@ with filter_cols[2]:
         st.session_state.filter = "General"
         st.rerun()
 with filter_cols[3]:
-    # Restored "Fairy Picks"
-    if st.button("Fairy Picks", key="btn_fairy", use_container_width=True, type="primary" if st.session_state.filter == "Fairy Picks" else "secondary"):
-        st.session_state.filter = "Fairy Picks"
-        st.rerun()
-with filter_cols[4]:
     if st.button("Help Info", key="btn_help", use_container_width=True, type="primary" if st.session_state.filter == "Help Request Info" else "secondary"):
         st.session_state.filter = "Help Request Info"
         st.rerun()
@@ -277,10 +246,8 @@ if st.session_state.filter != "All":
 if not display_posts:
     st.info(f"No threads found in '{st.session_state.filter}'")
 else:
-    # Use index-based key generation to avoid DuplicateElementKey errors
     cols = st.columns(3)
     for idx, post in enumerate(display_posts):
-        # Safety checks for dict keys to prevent KeyError
         post_id = post.get('id', idx)
         image_url = post.get('img', 'https://picsum.photos/seed/default/800/600')
         author = post.get('author', 'Unknown')
@@ -288,7 +255,6 @@ else:
         content = post.get('content', '')
         
         with cols[idx % 3]:
-            # Post Thumbnail Card (Custom HTML/CSS)
             st.markdown(f"""
                 <div class="knot-card">
                     <div class="card-bg" style="background-image: url('{image_url}');"></div>
@@ -303,7 +269,6 @@ else:
                 </div>
             """, unsafe_allow_html=True)
             
-            # Interactive read button (Keyed by post ID to ensure uniqueness)
             if st.button(f"OPEN THREAD ##{post_id}", key=f"read_{post_id}_{idx}", use_container_width=True):
                 st.session_state.active_post_id = post_id
                 st.rerun()
@@ -311,19 +276,18 @@ else:
 # --- SIDEBAR ---
 with st.sidebar:
     st.markdown('<h1 style="font-family: Orbitron; color: #f0e600; letter-spacing: 2px;">KNOT-LINK</h1>', unsafe_allow_html=True)
-    st.markdown('<p style="color: #888; font-size: 0.8rem;">PHAETHON ADMINISTRATIVE CONSOLE</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #888; font-size: 0.8rem;">ADMINISTRATIVE CONSOLE</p>', unsafe_allow_html=True)
     st.write("---")
     
     with st.form("new_post", clear_on_submit=True):
         st.write("PUBLISH NEW INTEL")
         new_title = st.text_input("Thread Title")
         new_content = st.text_area("Intel Summary")
-        new_category = st.selectbox("Assign Category", ["General", "Fairy Picks", "Help Request Info"])
+        new_category = st.selectbox("Assign Category", ["General", "Help Request Info"])
         new_img_keyword = st.text_input("Visual Seed (Keyword)")
         submitted = st.form_submit_button("BROADCAST")
         
         if submitted and new_title:
-            # Fixing SyntaxError from previous versions (missing parentheses/bracket closure)
             final_img = f"https://picsum.photos/seed/{new_img_keyword}/800/600" if new_img_keyword.strip() else "https://picsum.photos/seed/post/800/600"
             max_id = max([p["id"] for p in st.session_state.posts]) if st.session_state.posts else 0
             new_entry = {
