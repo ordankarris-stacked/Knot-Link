@@ -181,17 +181,20 @@ if 'posts' not in st.session_state:
 cols = st.columns(3)
 
 for idx, post in enumerate(st.session_state.posts):
+    # Fix for KeyError: Provide a default image if 'img' key is missing
+    image_url = post.get('img', 'https://picsum.photos/seed/default/400/300')
+    
     with cols[idx % 3]:
         st.markdown(f"""
             <div class="knot-card">
-                <div class="card-image" style="background-image: url('{post['img']}');"></div>
+                <div class="card-image" style="background-image: url('{image_url}');"></div>
                 <div class="card-content">
                     <div class="author-info">
                         <div class="avatar">👤</div>
-                        <span style="font-size: 0.75rem; font-weight: bold; color: #aaa;">{post['author']}</span>
+                        <span style="font-size: 0.75rem; font-weight: bold; color: #aaa;">{post.get('author', 'Unknown')}</span>
                     </div>
-                    <div class="card-title">{post['title']}</div>
-                    <div class="card-preview">{post['content'][:80]}...</div>
+                    <div class="card-title">{post.get('title', 'No Title')}</div>
+                    <div class="card-preview">{post.get('content', '')[:80]}...</div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
