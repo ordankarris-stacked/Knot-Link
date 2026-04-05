@@ -21,50 +21,51 @@ if 'posts' not in st.session_state:
     st.session_state.posts = [
         {
             "id": 1,
-            "author": "MetisIntelligence",
-            "title": "[Post] Vision's shocking scandal exposed — Perlman is going to jail!",
-            "content": "Charles Perlman, chief executive of Vision Corp, was caught in a fraud scheme involving hollow-tech smuggling. Evidence suggests a long-term operation that bypassed standard safety protocols.",
-            "img": "https://picsum.photos/seed/vision/800/600",
-            "category": "Help Request Info",
-            "replies": []
+            "author": "Reuters_Global",
+            "title": "[News] Federal Reserve signals potential rate cut in Q3",
+            "content": "In a surprising move, the Federal Reserve Chair indicated that inflation targets are nearing the 2% threshold, suggesting a shift in monetary policy to support labor market stability.",
+            "img": "https://picsum.photos/seed/finance/800/600",
+            "category": "General",
+            "replies": [
+                {"user": "MarketWatcher", "text": "About time, the housing market needs some breathing room."},
+                {"user": "EconStudent_99", "text": "Will this impact the dollar index significantly?"}
+            ]
         },
         {
             "id": 2,
-            "author": "Obsidian_Blade",
-            "title": "[Commission] Obsidian: Strategic Eradication",
-            "content": "Hollow activity has drastically diminished. Maximum alert level has now been temporarily lifted! I am the captain of a mercenary troupe hired by Obsidian Division...",
-            "img": "https://picsum.photos/seed/obsidian/800/600",
-            "category": "General",
+            "author": "TechCrunch_Official",
+            "title": "[Tech] New generative AI model breaks benchmarks for reasoning",
+            "content": "The latest model from leading research labs demonstrates unprecedented capabilities in mathematical proofing and complex coding tasks, raising questions about future software automation.",
+            "img": "https://picsum.photos/seed/ai_robot/800/600",
+            "category": "Help Request Info",
             "replies": [
-                {"user": "Kitty_Freak", "text": "That's terrifying... I'm keeping well away from the Hollows for now!"},
-                {"user": "Fantastical_Balut", "text": "There's no room for argument with Obsidian Division... *sigh*"},
-                {"user": "Doomed_Once_Daily", "text": "Doesn't really sound as though OP has any choice..."},
-                {"user": "ThreeSeven", "text": "Who would dream of taking on such a commission"}
+                {"user": "Dev_Lead", "text": "I tried the beta, the context window is actually insane."},
+                {"user": "Privacy_First", "text": "What about the training data transparency?"}
             ]
         },
         {
             "id": 3,
-            "author": "Worrybot",
-            "title": "A new Hollow on Fourteenth Street!",
-            "content": "A Companion Hollow has appeared suddenly. Citizens are advised to avoid the area until further notice.",
-            "img": "https://picsum.photos/seed/hollow/800/600",
+            "author": "Climate_Monitor",
+            "title": "[Alert] Record-breaking heatwave predicted for Northern Hemisphere",
+            "content": "Meteorologists warn that El Niño patterns combined with rising sea surface temperatures will likely lead to the hottest summer on record for North America and Europe.",
+            "img": "https://picsum.photos/seed/weather/800/600",
             "category": "General",
             "replies": []
         },
         {
             "id": 5,
-            "author": "Anonymous",
-            "title": "[Warning] Beware of the Proxy called Freeman's Antlers",
-            "content": "What a pain! This Proxy has been known to double-cross partners in the deeper layers. Stay sharp.",
-            "img": "https://picsum.photos/seed/warning/800/600",
+            "author": "CyberSecurity_Net",
+            "title": "[Security] Critical vulnerability found in widely used open-source library",
+            "content": "Security researchers have identified a zero-day exploit in the standard logging library used by 70% of enterprise web applications. Patching is required immediately.",
+            "img": "https://picsum.photos/seed/security/800/600",
             "category": "Help Request Info",
-            "replies": []
+            "replies": [{"user": "SysAdmin_Pro", "text": "Coffee is going to be my best friend tonight while I patch these servers."}]
         },
         {
             "id": 6,
             "author": "r/politics",
-            "title": "Trump issues warning to Iran",
-            "content": "Trump Vows To Strike Civilian Infrastructure if threats continue. Tensions rise in the region.",
+            "title": "Trump issues warning to Iran regarding maritime trade",
+            "content": "Donald Trump Vows To Strike Civilian Infrastructure if regional threats continue to escalate. Tensions rise in the region as diplomatic efforts face new challenges.",
             "img": "https://picsum.photos/seed/trump/800/600",
             "category": "General",
             "replies": []
@@ -223,7 +224,7 @@ if st.session_state.active_post_id:
                     <div class="reply-item">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                             <span style="color:#f0e600; font-weight:bold;">@{reply['user']}</span>
-                            <span style="color:#666; font-size:0.7rem;">LVL 60</span>
+                            <span style="color:#666; font-size:0.7rem;">Verified Member</span>
                         </div>
                         <div style="color:#eee; font-size:0.9rem;">{reply['text']}</div>
                     </div>
@@ -233,7 +234,7 @@ if st.session_state.active_post_id:
                 reply_text = st.text_input("Comment...", placeholder="Type your message here...")
                 if st.form_submit_button("POST REPLY"):
                     if reply_text:
-                        post["replies"].append({"user": "Anonymous User", "text": reply_text})
+                        post["replies"].append({"user": "WebUser_714", "text": reply_text})
                         st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
@@ -281,7 +282,7 @@ with st.sidebar:
     
     with st.form("new_post", clear_on_submit=True):
         st.write("PUBLISH NEW INTEL")
-        new_title = st.text_input("Thread Title")
+        new_title = st.text_input("Report Title")
         new_content = st.text_area("Intel Summary")
         new_category = st.selectbox("Assign Category", ["General", "Help Request Info"])
         new_img_keyword = st.text_input("Visual Seed (Keyword)")
@@ -292,7 +293,7 @@ with st.sidebar:
             max_id = max([p["id"] for p in st.session_state.posts]) if st.session_state.posts else 0
             new_entry = {
                 "id": max_id + 1,
-                "author": "Anonymous User",
+                "author": "Verified Source",
                 "title": new_title,
                 "content": new_content,
                 "img": final_img,
@@ -306,7 +307,7 @@ with st.sidebar:
     st.markdown(f"""
         <div style="background: #111; padding: 15px; border-radius: 10px; border: 1px solid #333;">
             <div style="font-size: 0.7rem; color: #666;">LOGGED AS</div>
-            <div style="color: #f0e600; font-weight: bold; font-family: Orbitron;">ANONYMOUS USER</div>
+            <div style="color: #f0e600; font-weight: bold; font-family: Orbitron;">ANONYMOUS_OPERATOR</div>
             <div style="font-size: 0.7rem; color: #00ff00; margin-top: 5px;">● ENCRYPTION ACTIVE</div>
         </div>
     """, unsafe_allow_html=True)
