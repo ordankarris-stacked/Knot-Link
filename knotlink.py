@@ -9,75 +9,81 @@ st.set_page_config(
     layout="wide"
 )
 
-# Initialize Session State for Filter and Posts
+# Initialize Session State for Filter, Posts, and Active Post (for modal view)
 if 'filter' not in st.session_state:
     st.session_state.filter = "All"
+
+if 'active_post_id' not in st.session_state:
+    st.session_state.active_post_id = None
 
 if 'posts' not in st.session_state:
     st.session_state.posts = [
         {
+            "id": 1,
             "author": "r/politics",
             "title": "Trump issues warning to Iran",
-            "content": "Trump Vows To Strike Civilian Infrastructure...",
+            "content": "Trump Vows To Strike Civilian Infrastructure if threats continue. Tensions rise in the region as diplomatic efforts stall.",
             "img": "https://picsum.photos/seed/trump/400/300",
             "category": "General",
-            "timestamp": time.time()
+            "replies": [
+                {"user": "Citizen_X", "text": "This is getting serious..."},
+                {"user": "GlobalWatcher", "text": "Hoping for a peaceful resolution."}
+            ]
         },
         {
+            "id": 2,
+            "author": "Obsidian_Blade",
+            "title": "[Commission] Obsidian: Strategic Eradication",
+            "content": "Hollow activity has drastically diminished. Maximum alert level has now been temporarily lifted! I am the captain of a mercenary troupe...",
+            "img": "https://picsum.photos/seed/obsidian/400/300",
+            "category": "Help Request Info",
+            "replies": [
+                {"user": "Kitty_Freak", "text": "That's terrifying... I'm keeping well away from the Hollows for now!"},
+                {"user": "Fantastical_Balut", "text": "There's no room for argument with Obsidian Division... *sigh*"},
+                {"user": "Doomed_Once_Daily", "text": "Doesn't really sound as though OP has any choice..."},
+                {"user": "ThreeSeven", "text": "Who would dream of taking on such a commission"}
+            ]
+        },
+        {
+            "id": 3,
             "author": "r/worldnews",
             "title": "US rescues missing pilot",
-            "content": "U.S. forces rescue second crew member...",
+            "content": "U.S. forces rescue second crew member after a daring overnight operation in hostile territory.",
             "img": "https://picsum.photos/seed/pilot/400/300",
             "category": "General",
-            "timestamp": time.time() - 3600
+            "replies": []
         },
         {
+            "id": 4,
             "author": "r/spaceporn",
             "title": "New Artemis II photos",
-            "content": "New Image from NASA: For the first tim...",
+            "content": "New Image from NASA: For the first time, we see the far side of the moon in high definition.",
             "img": None,
             "category": "General",
-            "timestamp": time.time() - 7200
+            "replies": [{"user": "StarGazer", "text": "Simply breathtaking."}]
         },
         {
-            "author": "r/Music",
-            "title": "Pepsi pulls out of Wi...",
-            "content": "Pepsi Cancels Sponsorship c...",
-            "img": "https://picsum.photos/seed/pepsi/400/300",
-            "category": "General",
-            "timestamp": time.time() - 10000
-        },
-        {
+            "id": 5,
             "author": "MetisIntelligence",
             "title": "[News] Vision's shocking scandal exposed",
-            "content": "Charles Perlman, chief executive of Vision Corp, was caught in a fraud scheme...",
+            "content": "Charles Perlman, chief executive of Vision Corp, was caught in a fraud scheme involving hollow-tech smuggling.",
             "img": "https://picsum.photos/seed/vision/400/300",
             "category": "Help Request Info",
-            "timestamp": time.time() - 15000
-        },
-        {
-            "author": "Hollow_Rabbit",
-            "title": "Anyone seen a runaway 'Security' Bangboo?",
-            "content": "Lost my modified Butler unit in the back alleys of 6th Street. Reward: Noodle Box.",
-            "img": None, 
-            "category": "Help Request Info",
-            "timestamp": time.time() - 20000
+            "replies": []
         }
     ]
 
-# Custom CSS for the Masonry Grid and Game UI look
+# Custom CSS
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700&display=swap');
     
-    /* Main Background */
     .stApp {
         background-color: #0d0d0d;
         color: #ffffff;
         font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Top Navigation Bar */
     .top-nav {
         display: flex;
         justify-content: center;
@@ -97,12 +103,11 @@ st.markdown("""
         border: 1px solid #333;
     }
     .nav-item.active {
-        background: #f0e600; /* ZZZ Yellow */
+        background: #f0e600;
         color: #000000;
         border: none;
     }
 
-    /* Post Cards - Grid Style */
     .knot-card {
         background-color: #1a1a1a;
         border-radius: 12px;
@@ -110,6 +115,7 @@ st.markdown("""
         margin-bottom: 20px;
         border: 1px solid #222;
         transition: transform 0.2s ease;
+        cursor: pointer;
     }
     .knot-card:hover {
         transform: translateY(-5px);
@@ -122,7 +128,7 @@ st.markdown("""
         background-size: cover;
         background-position: center;
         border-bottom: 1px solid #222;
-        background-color: #000; /* Black out fallback */
+        background-color: #000;
     }
 
     .card-content {
@@ -159,10 +165,25 @@ st.markdown("""
         color: #888;
         line-height: 1.4;
     }
+
+    /* Modal Overlay Styling */
+    .modal-overlay {
+        background-color: rgba(0,0,0,0.85);
+        padding: 40px;
+        border-radius: 15px;
+        border: 1px solid #444;
+    }
+    .reply-item {
+        background: #222;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 3px solid #f0e600;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# --- TOP NAVIGATION BAR ---
+# --- NAVIGATION ---
 st.markdown("""
     <div class="top-nav">
         <div class="nav-item active">Notifications</div>
@@ -171,7 +192,6 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Functional Sub-Category Filter
 filter_cols = st.columns([2, 1, 1, 1, 2])
 with filter_cols[1]:
     if st.button("All", use_container_width=True, type="primary" if st.session_state.filter == "All" else "secondary"):
@@ -188,12 +208,47 @@ with filter_cols[3]:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- FILTER LOGIC ---
+# --- MODAL VIEW (If a post is selected) ---
+if st.session_state.active_post_id:
+    post = next((p for p in st.session_state.posts if p["id"] == st.session_state.active_post_id), None)
+    if post:
+        st.markdown("---")
+        m_col1, m_col2 = st.columns([1, 1])
+        
+        with m_col1:
+            if post["img"]:
+                st.image(post["img"], use_container_width=True)
+            else:
+                st.markdown("<div style='height:300px; background:#000; border-radius:10px; display:flex; align-items:center; justify-content:center;'>NO SIGNAL</div>", unsafe_allow_html=True)
+            st.subheader(post["title"])
+            st.write(post["content"])
+            if st.button("CLOSE THREAD"):
+                st.session_state.active_post_id = None
+                st.rerun()
+
+        with m_col2:
+            st.markdown("### Replies")
+            for reply in post["replies"]:
+                st.markdown(f"""
+                    <div class="reply-item">
+                        <strong style="color:#f0e600; font-size:0.8rem;">{reply['user']}</strong><br>
+                        <span style="font-size:0.9rem;">{reply['text']}</span>
+                    </div>
+                """, unsafe_allow_html=True)
+            
+            with st.form("reply_form", clear_on_submit=True):
+                reply_text = st.text_input("Add a reply...")
+                if st.form_submit_button("REPLY"):
+                    if reply_text:
+                        post["replies"].append({"user": "Anonymous User", "text": reply_text})
+                        st.rerun()
+        st.markdown("---")
+
+# --- MAIN GRID ---
 display_posts = st.session_state.posts
 if st.session_state.filter != "All":
     display_posts = [p for p in st.session_state.posts if p.get("category") == st.session_state.filter]
 
-# --- MAIN GRID ---
 if not display_posts:
     st.info(f"No posts found in category: {st.session_state.filter}")
 else:
@@ -203,6 +258,7 @@ else:
         image_style = f"background-image: url('{image_url}');" if image_url else ""
         
         with cols[idx % 3]:
+            # Container for post
             st.markdown(f"""
                 <div class="knot-card">
                     <div class="card-image" style="{image_style}"></div>
@@ -212,12 +268,16 @@ else:
                             <span style="font-size: 0.75rem; font-weight: bold; color: #aaa;">{post.get('author', 'Unknown')}</span>
                         </div>
                         <div class="card-title">{post.get('title', 'No Title')}</div>
-                        <div class="card-preview">{post.get('content', '')[:80]}...</div>
+                        <div class="card-preview">{post.get('content', '')[:60]}...</div>
+                        <div style="font-size:0.7rem; color:#f0e600; margin-top:10px;">💬 {len(post['replies'])} Replies</div>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
+            if st.button(f"Read Thread ##{post['id']}", key=f"btn_{post['id']}", use_container_width=True):
+                st.session_state.active_post_id = post['id']
+                st.rerun()
 
-# --- POSTING INTERFACE (FLOATING ACTION) ---
+# --- SIDEBAR ---
 with st.sidebar:
     st.markdown('<h2 style="font-family: Orbitron; color: #f0e600;">KNOT-LINK</h2>', unsafe_allow_html=True)
     st.write("---")
@@ -226,24 +286,19 @@ with st.sidebar:
         new_title = st.text_input("Title")
         new_content = st.text_area("Description")
         new_category = st.selectbox("Category", ["General", "Help Request Info"])
-        new_img_seed = st.text_input("Image Keyword (Leave blank for no image)", "")
+        new_img_seed = st.text_input("Image Keyword", "")
         submitted = st.form_submit_button("PUBLISH")
         
         if submitted and new_title:
             final_img = f"https://picsum.photos/seed/{new_img_seed}/400/300" if new_img_seed.strip() else None
-            
+            new_id = max([p["id"] for p in st.session_state.posts]) + 1
             new_post = {
+                "id": new_id,
                 "author": "Anonymous User",
                 "title": new_title,
                 "content": new_content,
                 "img": final_img,
                 "category": new_category,
-                "timestamp": time.time()
+                "replies": []
             }
-            st.session_state.posts.insert(0, new_post)
-            st.rerun()
-
-    st.write("---")
-    st.caption(f"Logged in: Anonymous User")
-    st.caption(f"Active Filter: {st.session_state.filter}")
-    st.success("SYNC: ACTIVE")
+            st.session_state.posts.insert(0
