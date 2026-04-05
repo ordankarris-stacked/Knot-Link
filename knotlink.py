@@ -96,9 +96,9 @@ st.markdown("""
         border-radius: 20px;
         overflow: hidden;
         border: 2px solid #222;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         position: relative;
-        height: 520px;
+        height: 500px;
         display: flex;
         flex-direction: column;
         transition: transform 0.2s, border-color 0.2s;
@@ -131,7 +131,7 @@ st.markdown("""
         font-weight: 800;
         font-size: 16px;
         line-height: 1.2;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         color: #FFFFFF;
     }
 
@@ -140,36 +140,45 @@ st.markdown("""
         font-size: 12px;
         line-height: 1.4;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
 
     .card-footer {
         background-color: #1A1A1A;
-        padding: 15px 20px;
+        padding: 12px 15px;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         border-top: 1px solid #222;
     }
 
     .author-avatar {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         background-color: #222;
         border-radius: 50%;
-        border: 2px solid #E2FF00;
+        border: 1px solid #E2FF00;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .author-name {
         font-weight: 700;
-        font-size: 13px;
+        font-size: 12px;
         color: #FFF;
+    }
+
+    /* Detail View Styling */
+    .detail-comment-box {
+        background: #111;
+        border-left: 3px solid #E2FF00;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 0 10px 10px 0;
     }
 
     /* Sidebar Styling */
@@ -189,39 +198,43 @@ st.markdown("""
 if "posts" not in st.session_state:
     st.session_state.posts = [
         {
-            "id": 101,
-            "author": "TechWatch", 
-            "title": "[News] Major Data Breach at Global Logistics Firm Exposed", 
-            "content": "A high-profile logistics provider has confirmed a significant data leak affecting millions of records. Security experts suggest the breach originated from an unpatched SQL vulnerability in their regional server hub.",
+            "id": 201,
+            "author": "GlobalWatcher", 
+            "title": "[Post] Did y'all hear? Tech Giant's CEO just got the boot!", 
+            "content": "Word on the street is the CEO of the leading chip manufacturer was taken down after a secret board meeting. Anyone know if this is legit or just rumors? Stock market is reacting already.",
             "faction": "General", 
-            "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=400",
-            "replies": [{"author": "DevOps_Dan", "text": "This is why we patch on day one."}, {"author": "SysAdmin_Joe", "text": "Check your API keys, everyone."}]
+            "image": "https://images.unsplash.com/photo-1560179707-f14e90ef3623?q=80&w=400",
+            "replies": [
+                {"author": "ChopChop", "text": "Who? Why should we give a damn about any of this?"}, 
+                {"author": "Anonymous", "text": "Something must be happening in the silicon valley hub. Higher-ups cancelling events lately... it's fishy."},
+                {"author": "Beardy", "text": "Now that he's out of the picture, what about the new GPU lineup?"}
+            ]
         },
         {
-            "id": 102,
-            "author": "CloudTracker", 
-            "title": "AWS Outage Hits US-East-1 Region", 
-            "content": "Multiple services are reporting downtime as AWS investigates connectivity issues in Northern Virginia. Developers are advised to check multi-region failover configurations.",
+            "id": 202,
+            "author": "SpaceXplorer", 
+            "title": "[News] New Artemis II Mission Photos Released", 
+            "content": "NASA has just published high-res imagery from the latest lunar orbiter. The clarity of the south pole craters is unprecedented. Science twitter is blowing up.",
             "faction": "General", 
-            "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=400",
-            "replies": []
+            "image": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=400",
+            "replies": [{"author": "MoonLover", "text": "The lighting in these is incredible."}]
         },
         {
-            "id": 103,
-            "author": "SecureRoot", 
-            "title": "[Info] Essential 2FA Best Practices for 2024", 
-            "content": "Stop using SMS-based authentication. Hardware security keys and authenticator apps are the current standard for securing critical accounts against social engineering.",
-            "faction": "Tech Support", 
-            "image": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=400",
-            "replies": []
+            "id": 203,
+            "author": "SysAdmin_Help", 
+            "title": "[Question] How to quickly secure your cloud environment as a beginner?", 
+            "content": "Just started a small startup. We use AWS and Azure. What are the 'Carrot' essentials? I just want to make sure I don't get hit by ransomware on week one.",
+            "faction": "Help Info", 
+            "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=400",
+            "replies": [{"author": "Kitty_Freak", "text": "Enable MFA everywhere. That's step one. Don't skip it!"}]
         },
         {
-            "id": 104,
-            "author": "NetRunner", 
-            "title": "[Warning] New Phishing Campaign Mimicking IT Support", 
-            "content": "Users are reporting sophisticated emails that perfectly mirror internal IT tickets. Do not click links asking for credential verification without calling the desk directly.",
+            "id": 204,
+            "author": "MarketPulse", 
+            "title": "[Alert] Major Beverage Brand pulls out of Sponsorship", 
+            "content": "The blue and red soda brand has officially terminated its contract with the largest esports league. Claims of 'strategic realignment' are circulating.",
             "faction": "General", 
-            "image": "https://images.unsplash.com/photo-1510511459019-5dee997dd1db?auto=format&fit=crop&q=80&w=400",
+            "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400",
             "replies": []
         }
     ]
@@ -241,60 +254,78 @@ with header_col2:
     st.markdown("""
         <div class="nav-container">
             <div class="nav-btn">Notifications</div>
-            <div class="nav-btn nav-btn-active">Tech Board</div>
-            <div class="nav-btn">Hardware</div>
+            <div class="nav-btn nav-btn-active">Intel Board</div>
+            <div class="nav-btn">Schedule</div>
         </div>
     """, unsafe_allow_html=True)
 
 # --- FILTER TABS ---
 tab_cols = st.columns([0.8, 1, 1.2, 5])
-filters = ["All", "General", "Tech Support"]
+filters = ["All", "General", "Help Info"]
 
 for idx, f_name in enumerate(filters):
     with tab_cols[idx]:
         is_active = st.session_state.current_filter == f_name
+        # Clicking these filters jumps the page back to 'All' or specific categories and resets selected_post
         if st.button(f_name, key=f"tab_filter_{f_name}", type="primary" if is_active else "secondary", use_container_width=True):
             st.session_state.current_filter = f_name
-            st.session_state.selected_post = None
+            st.session_state.selected_post = None # Jump back to the board
             st.rerun()
 
 st.write("") 
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("### 🛰️ NETWORK UPLINK")
-    st.markdown(f"**Logon:** <span style='color:#E2FF00;'>Verified User</span>", unsafe_allow_html=True)
+    st.markdown("### 🛰️ TRANSMISSION")
+    st.markdown(f"**Logon:** <span style='color:#E2FF00;'>Verified_Node_77</span>", unsafe_allow_html=True)
     st.write("---")
-    new_title = st.text_input("Post Title", placeholder="Subject line...")
-    new_content = st.text_area("Message Body", placeholder="Share technical data...")
-    post_category = st.selectbox("Category", ["General", "Tech Support"])
-    if st.button("BROADCAST", use_container_width=True, type="primary"):
+    st.markdown("**New Signal**")
+    new_title = st.text_input("Signal Title", placeholder="e.g. [Alert] Vulnerability found...")
+    new_content = st.text_area("Signal Body", placeholder="Broadcast a message...")
+    post_category = st.selectbox("Frequency", ["General", "Help Info"])
+    if st.button("SEND SIGNAL", use_container_width=True, type="primary"):
         if new_content.strip() and new_title.strip():
             st.session_state.posts.insert(0, {
                 "id": random.randint(1000, 9999),
-                "author": "Verified User",
+                "author": "Verified_Node_77",
                 "title": new_title,
                 "content": new_content,
                 "faction": post_category,
-                "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=400",
+                "image": "https://images.unsplash.com/photo-1516245834210-c4c142787335?q=80&w=400",
                 "replies": []
             })
+            st.session_state.selected_post = None
             st.rerun()
 
 # --- MAIN CONTENT ---
 if st.session_state.selected_post:
     post = st.session_state.selected_post
-    if st.button("← Back to Board"):
-        st.session_state.selected_post = None
-        st.rerun()
+    col_back, col_spacer = st.columns([1, 4])
+    with col_back:
+        if st.button("← RETURN TO BOARD", use_container_width=True):
+            st.session_state.selected_post = None
+            st.rerun()
     
-    st.image(post.get('image', ""), use_container_width=True)
-    st.title(post.get('title', "Untitled Signal"))
-    st.write(post.get('content', ""))
-    st.write("---")
-    st.subheader("Community Discussions")
-    for r in post.get('replies', []):
-        st.markdown(f"**{r.get('author', '??')}**: {r.get('text', '')}")
+    st.markdown(f"### {post.get('title')}")
+    detail_img_col, detail_text_col = st.columns([1, 1.2])
+    
+    with detail_img_col:
+        st.image(post.get('image', ""), use_container_width=True)
+    
+    with detail_text_col:
+        st.markdown(f"**Posted by:** `{post.get('author')}`")
+        st.info(post.get('content'))
+        st.write("---")
+        st.markdown("**COMMUNITY LOGS**")
+        if not post.get('replies'):
+            st.write("*No signals received for this post yet.*")
+        for i, r in enumerate(post.get('replies', [])):
+            st.markdown(f"""
+                <div class="detail-comment-box">
+                    <div style="font-size:10px; color:#E2FF00; margin-bottom:5px;">{i+1}F // {r.get('author')}</div>
+                    <div style="font-size:13px;">{r.get('text')}</div>
+                </div>
+            """, unsafe_allow_html=True)
 
 else:
     # GRID VIEW
@@ -302,33 +333,37 @@ else:
     if st.session_state.current_filter != "All":
         display_posts = [p for p in st.session_state.posts if p.get('faction') == st.session_state.current_filter]
 
-    rows = [display_posts[i:i + 4] for i in range(0, len(display_posts), 4)]
-    
-    for row in rows:
-        cols = st.columns(4)
-        for idx, post in enumerate(row):
-            p_id = post.get('id', random.randint(0, 9999))
-            img_url = post.get('image', "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400")
-            p_title = post.get('title', "Untitled Post")
-            p_author = post.get('author', "Unknown")
-            p_content = post.get('content', "No further details available for this log.")
+    if not display_posts:
+        st.warning("No data found on this frequency.")
+    else:
+        # Create a responsive grid
+        rows = [display_posts[i:i + 4] for i in range(0, len(display_posts), 4)]
+        
+        for row in rows:
+            cols = st.columns(4)
+            for idx, post in enumerate(row):
+                p_id = post.get('id')
+                img_url = post.get('image', "")
+                p_title = post.get('title', "Untitled Signal")
+                p_author = post.get('author', "Unknown")
+                p_content = post.get('content', "...")
 
-            with cols[idx]:
-                st.markdown(f"""
-                    <div class="card-container">
-                        <div class="card-image-box" style="background-image: url('{img_url}');">
-                            <div class="card-overlay">
-                                <div class="post-title">{p_title}</div>
-                                <div class="post-content-preview">{p_content}</div>
+                with cols[idx]:
+                    st.markdown(f"""
+                        <div class="card-container">
+                            <div class="card-image-box" style="background-image: url('{img_url}');">
+                                <div class="card-overlay">
+                                    <div class="post-title">{p_title}</div>
+                                    <div class="post-content-preview">{p_content}</div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="author-avatar">⚡</div>
+                                <div class="author-name">{p_author}</div>
                             </div>
                         </div>
-                        <div class="card-footer">
-                            <div class="author-avatar">💻</div>
-                            <div class="author-name">{p_author}</div>
-                        </div>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-                if st.button(f"DETAILS #{p_id}", key=f"btn_view_{p_id}", use_container_width=True):
-                    st.session_state.selected_post = post
-                    st.rerun()
+                    """, unsafe_allow_html=True)
+                    
+                    if st.button(f"READ SIGNAL #{p_id}", key=f"btn_view_{p_id}", use_container_width=True):
+                        st.session_state.selected_post = post
+                        st.rerun()
