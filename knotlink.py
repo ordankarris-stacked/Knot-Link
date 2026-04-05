@@ -208,18 +208,20 @@ cols = st.columns(3)
 
 for idx, post in enumerate(st.session_state.posts):
     col_idx = idx % 3
+    # Use .get() to avoid KeyError if 'color' is missing from old session data
+    bg_color = post.get('color', '#1a1a1a')
     with cols[col_idx]:
         st.markdown(f"""
             <div class="card-container">
-                <div class="card-image" style="background-color: {post['color']};">
+                <div class="card-image" style="background-color: {bg_color};">
                     <div class="author-badge">
                         <div class="author-avatar"></div>
                         <span class="author-name">{post['author']}</span>
                     </div>
                 </div>
                 <div class="card-footer">
-                    <div class="post-title">{post['title']}</div>
-                    <div class="post-content">{post['content']}</div>
+                    <div class="post-title">{post.get('title', 'Untitled')}</div>
+                    <div class="post-content">{post.get('content', 'No content available.')}</div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
