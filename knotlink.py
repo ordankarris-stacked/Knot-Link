@@ -4,7 +4,7 @@ import random
 
 # --- UI CONFIGURATION ---
 st.set_page_config(
-    page_title="Knot-Link // Tech Network",
+    page_title="Knot-Link // Proxy Network",
     page_icon="🕸️",
     layout="wide",
 )
@@ -186,43 +186,34 @@ st.markdown("""
 if "posts" not in st.session_state:
     st.session_state.posts = [
         {
-            "id": 201,
+            "id": 101,
             "author": "GlobalWatcher", 
-            "title": "[Post] Did y'all hear? Tech Giant's CEO just got the boot!", 
-            "content": "Word on the street is the CEO of the leading chip manufacturer was taken down after a secret board meeting. Stock market is reacting already.",
+            "title": "[Post] Did y'all hear? Porcelumex's CEO just got the boot!", 
+            "content": "Heard Porcelumex's CEO Ferox got taken down. Anyone know if this is legit or just rumors?",
             "faction": "General", 
             "image": "https://images.unsplash.com/photo-1560179707-f14e90ef3623?q=80&w=400",
             "replies": [
-                {"author": "ChopChop", "text": "Who? Why should we give a damn about any of this?"}, 
-                {"author": "Anonymous", "text": "Something must be happening in the silicon valley hub. Fishy situation."},
-                {"author": "Beardy", "text": "What about the new GPU lineup?"}
+                {"author": "ChopChop", "text": "Who? Why should we give a Denny about any of this?"}, 
+                {"author": "Anonymous", "text": "Something must be happening in the Waifei Peninsula. This situation is fishy."},
+                {"author": "Beardy", "text": "Now that he's out of the picture, what about Lucro?"}
             ]
         },
         {
-            "id": 202,
+            "id": 103,
             "author": "SpaceXplorer", 
             "title": "[News] New Artemis II Mission Photos Released", 
             "content": "NASA has just published high-res imagery from the latest lunar orbiter. The clarity of the south pole craters is unprecedented.",
             "faction": "General", 
             "image": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=400",
-            "replies": [{"author": "MoonLover", "text": "The lighting in these is incredible."}]
+            "replies": []
         },
         {
-            "id": 203,
+            "id": 104,
             "author": "SysAdmin_Help", 
             "title": "[Question] How to quickly secure your cloud environment?", 
             "content": "Just started a small startup. We use AWS and Azure. What are the 'Carrot' essentials to prevent ransomware?",
             "faction": "Help Info", 
             "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=400",
-            "replies": [{"author": "Kitty_Freak", "text": "Enable MFA everywhere. That's step one. Don't skip it!"}]
-        },
-        {
-            "id": 204,
-            "author": "MarketPulse", 
-            "title": "[Alert] Major Beverage Brand pulls out of Sponsorship", 
-            "content": "The blue and red soda brand has officially terminated its contract with the largest esports league.",
-            "faction": "General", 
-            "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400",
             "replies": []
         }
     ]
@@ -241,13 +232,15 @@ with header_col1:
 with header_col2:
     st.markdown("""
         <div class="nav-container">
-            <div class="nav-btn">Notifications</div>
-            <div class="nav-btn nav-btn-active">Intel Board</div>
+            <div class="nav-btn">NOTIFICATIONS</div>
+            <div class="nav-btn nav-btn-active">INTEL BOARD</div>
+            <div class="nav-btn">SCHEDULE</div>
         </div>
     """, unsafe_allow_html=True)
 
 # --- FILTER TABS ---
-f_col1, f_col2, f_col3, f_col4 = st.columns([0.8, 1, 1.2, 5])
+f_col1, f_col2, f_col3, f_col4 = st.columns([0.6, 0.8, 1, 5.6])
+# "Fairy Picks" removed from filters
 filters = ["All", "General", "Help Info"]
 
 for idx, f_name in enumerate(filters):
@@ -262,15 +255,15 @@ st.write("")
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("### 🛰️ ACCESS")
-    # Restore the 20:00 version of sidebar status and functions
-    st.markdown(f"**Login Status:** <span style='color:#E2FF00;'>Anonymous User</span>", unsafe_allow_html=True)
+    st.markdown("### 🛰️ TRANSMISSION")
+    st.markdown(f"**Logon Status:** <span style='color:#E2FF00;'>Anonymous User</span>", unsafe_allow_html=True)
     st.write("---")
     
-    # Restored "Send Signal" Functionality
-    st.markdown("### 📡 TRANSMISSION")
-    new_title = st.text_input("Signal Title", placeholder="e.g. [Alert] News...")
+    # "Send Signal" Functionality
+    st.markdown("### 📡 BROADCAST")
+    new_title = st.text_input("Signal Title", placeholder="e.g. [Question] Leveling up...")
     new_content = st.text_area("Signal Body", placeholder="Broadcast a message...")
+    # "Fairy Picks" removed from selectbox
     post_category = st.selectbox("Frequency", ["General", "Help Info"])
     
     if st.button("SEND SIGNAL", use_container_width=True, type="primary"):
@@ -305,6 +298,8 @@ if st.session_state.selected_post:
         st.info(post.get('content'))
         st.write("---")
         st.markdown("**COMMUNITY LOGS**")
+        if not post.get('replies'):
+            st.write("*No logs found on this frequency.*")
         for i, r in enumerate(post.get('replies', [])):
             st.markdown(f"""
                 <div class="detail-comment-box">
@@ -339,9 +334,11 @@ else:
                             </div>
                         </div>
                     """
-                    # Make card clickable
-                    if st.button("", key=f"card_btn_{post.get('id')}", use_container_width=True):
+                    # Use unique key for each button to avoid streamlit ID collisions
+                    if st.button(f"READ SIGNAL #{post.get('id')}", key=f"btn_{post.get('id')}", use_container_width=True):
                         st.session_state.selected_post = post
                         st.rerun()
                     
                     st.markdown(f'<div style="margin-top:-60px; pointer-events:none;">{card_html}</div>', unsafe_allow_html=True)
+    else:
+        st.warning("No active signals found on this frequency.")
