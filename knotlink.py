@@ -253,29 +253,34 @@ st.write("")
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("### 🛰️ TRANSMISSION")
+    st.markdown("### 🛰️ ACCESS")
     st.markdown(f"**Logon Status:** <span style='color:#E2FF00;'>Anonymous User</span>", unsafe_allow_html=True)
     st.write("---")
     
     # "Send Signal" Functionality
-    st.markdown("### 📡 BROADCAST")
-    new_title = st.text_input("Signal Title", placeholder="e.g. [Question] Leveling up...")
-    new_content = st.text_area("Signal Body", placeholder="Broadcast a message...")
-    post_category = st.selectbox("Frequency", ["General", "Help Info"])
-    
-    if st.button("SEND SIGNAL", use_container_width=True, type="primary"):
-        if new_content.strip() and new_title.strip():
-            st.session_state.posts.insert(0, {
-                "id": random.randint(1000, 9999),
-                "author": "Anonymous User",
-                "title": new_title,
-                "content": new_content,
-                "faction": post_category,
-                "image": "https://images.unsplash.com/photo-1516245834210-c4c142787335?q=80&w=400",
-                "replies": []
-            })
-            st.session_state.selected_post = None
-            st.rerun()
+    st.markdown("### 📡 SEND SIGNAL")
+    with st.form("signal_form", clear_on_submit=True):
+        new_title = st.text_input("Signal Name", placeholder="Enter signal title...")
+        new_content = st.text_area("Content", placeholder="Broadcast your message...")
+        post_category = st.selectbox("Frequency", ["General", "Help Info"])
+        
+        submitted = st.form_submit_button("SEND SIGNAL", use_container_width=True)
+        if submitted:
+            if new_title.strip() and new_content.strip():
+                new_post = {
+                    "id": random.randint(1000, 9999),
+                    "author": "Anonymous User",
+                    "title": new_title,
+                    "content": new_content,
+                    "faction": post_category,
+                    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400",
+                    "replies": []
+                }
+                st.session_state.posts.insert(0, new_post)
+                st.session_state.selected_post = None
+                st.rerun()
+            else:
+                st.error("Signal requires a title and content.")
 
 # --- MAIN CONTENT ---
 if st.session_state.selected_post:
