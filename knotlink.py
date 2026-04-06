@@ -84,7 +84,7 @@ st.markdown("""
         overflow: hidden;
     }
 
-    /* GUI DETAIL VIEW (image_62f445.jpg style) */
+    /* GUI DETAIL VIEW */
     .gui-window {
         background-color: #0c0c0c;
         border: 2px solid #222;
@@ -125,32 +125,8 @@ st.markdown("""
         align-items: center;
         gap: 4px;
     }
-    .close-btn {
-        background: #ff3b30;
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        color: white;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    }
 
     /* Content Area */
-    .content-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-    .content-left {
-        background: #1a1a1a;
-        border-radius: 15px;
-        padding: 0;
-        overflow: hidden;
-    }
     .content-right {
         background: rgba(255,255,255,0.03);
         border-radius: 15px;
@@ -197,10 +173,23 @@ st.markdown("""
         border: 1px solid #333;
         border-radius: 10px;
         font-weight: 700;
+        position: relative;
     }
     .stButton>button:hover {
         border-color: #E2FF00;
         color: #E2FF00;
+    }
+    
+    /* Notification Red Dot */
+    .notif-dot {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        width: 10px;
+        height: 10px;
+        background-color: #ff3b30;
+        border-radius: 50%;
+        border: 2px solid #000;
     }
     
     /* Transmit Panel */
@@ -210,6 +199,15 @@ st.markdown("""
         border-radius: 24px;
         padding: 30px;
         margin-top: 20px;
+    }
+
+    /* Notification Item */
+    .notif-item {
+        background: #1a1a1a;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        border-left: 4px solid #E2FF00;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -255,6 +253,9 @@ if "posts" not in st.session_state:
         }
     ]
 
+if "notifications" not in st.session_state:
+    st.session_state.notifications = []
+
 if "view" not in st.session_state:
     st.session_state.view = "board"
 if "selected_idx" not in st.session_state:
@@ -267,7 +268,15 @@ with h_col1:
 with h_col2:
     n_cols = st.columns([1, 1, 1])
     with n_cols[0]:
-        if st.button("NOTIFICATIONS", use_container_width=True): pass
+        has_notif = len(st.session_state.notifications) > 0
+        notif_label = "NOTIFICATIONS"
+        # Manual injection of red dot if notifications exist
+        if st.button(notif_label, use_container_width=True):
+            st.session_state.view = "notifications"
+            st.rerun()
+        if has_notif:
+            st.markdown('<div style="position:relative;"><div class="notif-dot" style="top: -42px; right: 8px;"></div></div>', unsafe_allow_html=True)
+            
     with n_cols[1]:
         is_board = st.session_state.view == "board" or st.session_state.view == "gui"
         if st.button("INTEL BOARD", type="primary" if is_board else "secondary", use_container_width=True):
@@ -283,7 +292,6 @@ with h_col2:
 
 # 1. BOARD VIEW
 if st.session_state.view == "board":
-    # Faction filter tabs
     t1, t2, t3, t4 = st.columns([0.4, 0.4, 0.4, 3])
     with t1: st.button("All", type="primary")
     with t2: st.button("General")
@@ -291,7 +299,6 @@ if st.session_state.view == "board":
 
     st.write("")
     
-    # Grid of posts
     cols = st.columns(4)
     for i, post in enumerate(st.session_state.posts):
         with cols[i % 4]:
@@ -307,7 +314,6 @@ if st.session_state.view == "board":
                 </div>
             """, unsafe_allow_html=True)
             
-            # Clickable Button overlaying the aesthetic
             if st.button(f"READ SIGNAL #{post['id']}", key=f"btn_{i}", use_container_width=True):
                 st.session_state.selected_idx = i
                 st.session_state.view = "gui"
@@ -318,7 +324,6 @@ if st.session_state.view == "board":
 elif st.session_state.view == "gui":
     post = st.session_state.posts[st.session_state.selected_idx]
     
-    # Render the Window
     st.markdown(f"""
         <div class="gui-window">
             <div class="gui-header">
@@ -338,7 +343,6 @@ elif st.session_state.view == "gui":
     c1, c2 = st.columns([1, 1])
     
     with c1:
-        # Left side: Image and Text
         st.markdown(f"""
             <div style="position:relative; border-radius:15px; overflow:hidden; border:1px solid #333;">
                 <img src="{post['image']}" style="width:100%; display:block;">
@@ -351,7 +355,6 @@ elif st.session_state.view == "gui":
         """, unsafe_allow_html=True)
         
     with c2:
-        # Right side: Comments
         st.markdown('<div class="content-right">', unsafe_allow_html=True)
         for r in post['replies']:
             st.markdown(f"""
@@ -365,22 +368,30 @@ elif st.session_state.view == "gui":
                 </div>
             """, unsafe_allow_html=True)
         
-        # Reply section
         st.write("---")
         with st.form("reply_form", clear_on_submit=True):
             r_text = st.text_input("Transmitting reply...", placeholder="Say something to this proxy...")
             if st.form_submit_button("SEND LOG"):
                 if r_text:
                     new_floor = f"{len(post['replies']) + 1}F"
+                    # Add reply to post
                     st.session_state.posts[st.session_state.selected_idx]['replies'].append({
                         "author": "NetworkProxy",
                         "text": r_text,
                         "floor": new_floor
                     })
+                    # Notification Logic: Since "Phaethon" is effectively the user,
+                    # if they reply to someone else's post, we mock that other users might reply back instantly
+                    # For this demo, any reply sent adds a "Notification" about the activity
+                    st.session_state.notifications.append({
+                        "type": "reply",
+                        "post_title": post['title'],
+                        "message": f"Activity on signal #{post['id']}: New log appended by NetworkProxy.",
+                        "time": datetime.now().strftime("%H:%M")
+                    })
                     st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # Close button logic
     if st.button("❌ CLOSE INTERFACE", use_container_width=True):
         st.session_state.view = "board"
         st.rerun()
@@ -394,10 +405,7 @@ elif st.session_state.view == "transmit":
     with st.form("transmit_signal_form", clear_on_submit=True):
         new_title = st.text_input("POST NAME", placeholder="Enter signal title...")
         new_content = st.text_area("CONTENT", placeholder="Enter the body of your transmission...", height=200)
-        
-        # Faction & Image selection (Defaults for now)
         st.caption("Auto-assigning frequency: General")
-        
         submit_signal = st.form_submit_button("BROADCAST TO BOARD", use_container_width=True)
         
         if submit_signal:
@@ -421,6 +429,32 @@ elif st.session_state.view == "transmit":
     st.markdown('</div>', unsafe_allow_html=True)
     
     if st.button("Cancel & Return"):
+        st.session_state.view = "board"
+        st.rerun()
+
+# 4. NOTIFICATIONS VIEW
+elif st.session_state.view == "notifications":
+    st.markdown("## 🔔 SIGNAL ALERTS")
+    if not st.session_state.notifications:
+        st.info("No active alerts at this time.")
+    else:
+        for n in reversed(st.session_state.notifications):
+            st.markdown(f"""
+                <div class="notif-item">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:800; color:#E2FF00;">NEW REPLY</span>
+                        <span style="font-size:10px; color:#666;">{n['time']}</span>
+                    </div>
+                    <div style="font-size:14px; margin-top:5px;">{n['message']}</div>
+                    <div style="font-size:11px; color:#888; margin-top:5px;">Source: {n['post_title']}</div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        if st.button("CLEAR ALL ALERTS", use_container_width=True):
+            st.session_state.notifications = []
+            st.rerun()
+
+    if st.button("Return to Intel Board"):
         st.session_state.view = "board"
         st.rerun()
 
