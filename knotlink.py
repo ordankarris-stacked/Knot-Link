@@ -202,6 +202,15 @@ st.markdown("""
         border-color: #E2FF00;
         color: #E2FF00;
     }
+    
+    /* Transmit Panel */
+    .transmit-container {
+        background: #111;
+        border: 2px solid #E2FF00;
+        border-radius: 24px;
+        padding: 30px;
+        margin-top: 20px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -256,12 +265,18 @@ h_col1, h_col2 = st.columns([1, 1])
 with h_col1:
     st.markdown('<div class="brand-container"><div class="brand-title">KNOT-<span>LINK</span></div></div>', unsafe_allow_html=True)
 with h_col2:
-    n_cols = st.columns([1, 1])
+    n_cols = st.columns([1, 1, 1])
     with n_cols[0]:
         if st.button("NOTIFICATIONS", use_container_width=True): pass
     with n_cols[1]:
-        if st.button("INTEL BOARD", type="primary", use_container_width=True):
+        is_board = st.session_state.view == "board" or st.session_state.view == "gui"
+        if st.button("INTEL BOARD", type="primary" if is_board else "secondary", use_container_width=True):
             st.session_state.view = "board"
+            st.rerun()
+    with n_cols[2]:
+        is_transmit = st.session_state.view == "transmit"
+        if st.button("SEND SIGNAL 📡", type="primary" if is_transmit else "secondary", use_container_width=True):
+            st.session_state.view = "transmit"
             st.rerun()
 
 # --- MAIN LOGIC ---
@@ -371,6 +386,43 @@ elif st.session_state.view == "gui":
         st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
+
+# 3. TRANSMIT VIEW
+elif st.session_state.view == "transmit":
+    st.markdown("## 📡 INITIATE NEW SIGNAL")
+    st.markdown('<div class="transmit-container">', unsafe_allow_html=True)
+    with st.form("transmit_signal_form", clear_on_submit=True):
+        new_title = st.text_input("POST NAME", placeholder="Enter signal title...")
+        new_content = st.text_area("CONTENT", placeholder="Enter the body of your transmission...", height=200)
+        
+        # Faction & Image selection (Defaults for now)
+        st.caption("Auto-assigning frequency: General")
+        
+        submit_signal = st.form_submit_button("BROADCAST TO BOARD", use_container_width=True)
+        
+        if submit_signal:
+            if new_title.strip() and new_content.strip():
+                new_post = {
+                    "id": random.randint(1000, 9999),
+                    "author": "Phaethon",
+                    "title": new_title,
+                    "content": new_content,
+                    "faction": "General",
+                    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600",
+                    "likes": 0,
+                    "replies": []
+                }
+                st.session_state.posts.insert(0, new_post)
+                st.session_state.view = "board"
+                st.success("Signal broadcasted successfully!")
+                st.rerun()
+            else:
+                st.error("Signal broadcast failed: Name and Content are mandatory.")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    if st.button("Cancel & Return"):
+        st.session_state.view = "board"
+        st.rerun()
 
 # Footer info
 st.markdown("""
