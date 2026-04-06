@@ -396,14 +396,14 @@ elif st.session_state.view == "gui":
                 if r_text:
                     new_floor = f"{len(post['replies']) + 1}F"
                     st.session_state.posts[st.session_state.selected_idx]['replies'].append({
-                        "author": "NetworkProxy",
+                        "author": "Anonymous",
                         "text": r_text,
                         "floor": new_floor
                     })
                     st.session_state.notifications.append({
                         "type": "reply",
                         "post_title": post['title'],
-                        "message": f"Activity on signal #{post['id']}: New log appended by NetworkProxy.",
+                        "message": f"Activity on signal #{post['id']}: New log appended by Anonymous.",
                         "time": datetime.now().strftime("%H:%M")
                     })
                     st.rerun()
@@ -423,7 +423,7 @@ elif st.session_state.view == "transmit":
         new_title = st.text_input("POST NAME", placeholder="Enter signal title...")
         new_content = st.text_area("CONTENT", placeholder="Enter the body of your transmission...", height=200)
         
-        # New selection for faction
+        # Selection for faction
         new_faction = st.selectbox("FREQUENCY (CATEGORY)", ["General", "Help Info"])
         
         submit_signal = st.form_submit_button("BROADCAST TO BOARD", use_container_width=True)
@@ -432,7 +432,7 @@ elif st.session_state.view == "transmit":
             if new_title.strip() and new_content.strip():
                 new_post = {
                     "id": random.randint(1000, 9999),
-                    "author": "Phaethon",
+                    "author": "Anonymous",
                     "title": new_title,
                     "content": new_content,
                     "faction": new_faction,
@@ -442,7 +442,7 @@ elif st.session_state.view == "transmit":
                 }
                 st.session_state.posts.insert(0, new_post)
                 st.session_state.view = "board"
-                st.success("Signal broadcasted successfully!")
+                st.success("Signal broadcasted anonymously!")
                 st.rerun()
             else:
                 st.error("Signal broadcast failed: Name and Content are mandatory.")
