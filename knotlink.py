@@ -265,6 +265,8 @@ with st.sidebar:
     st.markdown("### 🛰️ ACCESS")
     st.markdown(f"**Login:** <span style='color:#E2FF00;'>Anonymous User</span>", unsafe_allow_html=True)
     st.write("---")
+    
+    # Restored Send Signal Functionality
     st.markdown("### 📡 TRANSMISSION")
     new_title = st.text_input("Signal Title", placeholder="e.g. [Alert] News...")
     new_content = st.text_area("Signal Body", placeholder="Broadcast a message...")
