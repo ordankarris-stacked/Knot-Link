@@ -260,6 +260,8 @@ if "view" not in st.session_state:
     st.session_state.view = "board"
 if "selected_idx" not in st.session_state:
     st.session_state.selected_idx = None
+if "filter_category" not in st.session_state:
+    st.session_state.filter_category = "All"
 
 # --- HEADER ---
 h_col1, h_col2 = st.columns([1, 1])
@@ -270,7 +272,6 @@ with h_col2:
     with n_cols[0]:
         has_notif = len(st.session_state.notifications) > 0
         notif_label = "NOTIFICATIONS"
-        # Manual injection of red dot if notifications exist
         if st.button(notif_label, use_container_width=True):
             st.session_state.view = "notifications"
             st.rerun()
@@ -293,32 +294,52 @@ with h_col2:
 # 1. BOARD VIEW
 if st.session_state.view == "board":
     t1, t2, t3, t4 = st.columns([0.4, 0.4, 0.4, 3])
-    with t1: st.button("All", type="primary")
-    with t2: st.button("General")
-    with t3: st.button("Help Info")
+    with t1: 
+        if st.button("All", type="primary" if st.session_state.filter_category == "All" else "secondary"):
+            st.session_state.filter_category = "All"
+            st.rerun()
+    with t2: 
+        if st.button("General", type="primary" if st.session_state.filter_category == "General" else "secondary"):
+            st.session_state.filter_category = "General"
+            st.rerun()
+    with t3: 
+        if st.button("Help Info", type="primary" if st.session_state.filter_category == "Help Info" else "secondary"):
+            st.session_state.filter_category = "Help Info"
+            st.rerun()
 
     st.write("")
     
-    cols = st.columns(4)
-    for i, post in enumerate(st.session_state.posts):
-        with cols[i % 4]:
-            st.markdown(f"""
-                <div class="post-card">
-                    <div class="post-img-container" style="background-image: url('{post['image']}');">
-                        <div class="post-overlay"></div>
-                        <div class="post-text-content">
-                            <div class="post-card-title">{post['title']}</div>
-                            <div class="post-card-desc">{post['content']}</div>
+    # Filter the list based on selection
+    filtered_posts = st.session_state.posts
+    if st.session_state.filter_category != "All":
+        filtered_posts = [p for p in st.session_state.posts if p["faction"] == st.session_state.filter_category]
+
+    if not filtered_posts:
+        st.info(f"No signals found in the '{st.session_state.filter_category}' frequency.")
+    else:
+        cols = st.columns(4)
+        for i, post in enumerate(filtered_posts):
+            # We need the original index for the selected_idx state
+            original_idx = next(idx for idx, p in enumerate(st.session_state.posts) if p["id"] == post["id"])
+            
+            with cols[i % 4]:
+                st.markdown(f"""
+                    <div class="post-card">
+                        <div class="post-img-container" style="background-image: url('{post['image']}');">
+                            <div class="post-overlay"></div>
+                            <div class="post-text-content">
+                                <div class="post-card-title">{post['title']}</div>
+                                <div class="post-card-desc">{post['content']}</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            if st.button(f"READ SIGNAL #{post['id']}", key=f"btn_{i}", use_container_width=True):
-                st.session_state.selected_idx = i
-                st.session_state.view = "gui"
-                st.rerun()
-            st.markdown(f'<div style="margin-top:-10px; font-size:10px; color:#444; padding-left:5px;">👤 {post["author"]}</div>', unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
+                
+                if st.button(f"READ SIGNAL #{post['id']}", key=f"btn_{post['id']}", use_container_width=True):
+                    st.session_state.selected_idx = original_idx
+                    st.session_state.view = "gui"
+                    st.rerun()
+                st.markdown(f'<div style="margin-top:-10px; font-size:10px; color:#444; padding-left:5px;">👤 {post["author"]} | 🏷️ {post["faction"]}</div>', unsafe_allow_html=True)
 
 # 2. GUI DETAIL VIEW
 elif st.session_state.view == "gui":
@@ -335,7 +356,7 @@ elif st.session_state.view == "gui":
                     </div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <div style="color:#666; font-size:12px; align-self:center;">#{post['id']}</div>
+                    <div style="color:#666; font-size:12px; align-self:center;">#{post['id']} | {post['faction']}</div>
                 </div>
             </div>
     """, unsafe_allow_html=True)
@@ -374,15 +395,11 @@ elif st.session_state.view == "gui":
             if st.form_submit_button("SEND LOG"):
                 if r_text:
                     new_floor = f"{len(post['replies']) + 1}F"
-                    # Add reply to post
                     st.session_state.posts[st.session_state.selected_idx]['replies'].append({
                         "author": "NetworkProxy",
                         "text": r_text,
                         "floor": new_floor
                     })
-                    # Notification Logic: Since "Phaethon" is effectively the user,
-                    # if they reply to someone else's post, we mock that other users might reply back instantly
-                    # For this demo, any reply sent adds a "Notification" about the activity
                     st.session_state.notifications.append({
                         "type": "reply",
                         "post_title": post['title'],
@@ -405,7 +422,10 @@ elif st.session_state.view == "transmit":
     with st.form("transmit_signal_form", clear_on_submit=True):
         new_title = st.text_input("POST NAME", placeholder="Enter signal title...")
         new_content = st.text_area("CONTENT", placeholder="Enter the body of your transmission...", height=200)
-        st.caption("Auto-assigning frequency: General")
+        
+        # New selection for faction
+        new_faction = st.selectbox("FREQUENCY (CATEGORY)", ["General", "Help Info"])
+        
         submit_signal = st.form_submit_button("BROADCAST TO BOARD", use_container_width=True)
         
         if submit_signal:
@@ -415,7 +435,7 @@ elif st.session_state.view == "transmit":
                     "author": "Phaethon",
                     "title": new_title,
                     "content": new_content,
-                    "faction": "General",
+                    "faction": new_faction,
                     "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600",
                     "likes": 0,
                     "replies": []
