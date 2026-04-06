@@ -144,12 +144,36 @@ st.markdown("""
     }
 
     /* Detail View Styling */
+    .detail-container {
+        background-color: #0c0c0c;
+        border: 2px solid #222;
+        border-radius: 24px;
+        padding: 0;
+        overflow: hidden;
+    }
+    
+    .detail-header-tag {
+        background: #E2FF00;
+        color: #000;
+        display: inline-block;
+        padding: 4px 12px;
+        font-weight: 800;
+        font-size: 12px;
+        border-radius: 0 0 10px 0;
+        margin-bottom: 15px;
+    }
+
     .detail-comment-box {
-        background: #111;
-        border-left: 3px solid #E2FF00;
+        background: #181818;
+        border-radius: 12px;
         padding: 15px;
-        margin-bottom: 10px;
-        border-radius: 0 10px 10px 0;
+        margin-bottom: 12px;
+        border-left: 4px solid #333;
+        transition: border-color 0.3s;
+    }
+    
+    .detail-comment-box:hover {
+        border-left-color: #E2FF00;
     }
 
     /* Sidebar Styling */
@@ -172,7 +196,7 @@ if "posts" not in st.session_state:
             "id": 101,
             "author": "GlobalWatcher", 
             "title": "[Post] Did y'all hear? Porcelumex's CEO just got the boot!", 
-            "content": "Heard Porcelumex's CEO Ferox got taken down. Anyone know if this is legit or just rumors?",
+            "content": "Heard Porcelumex's CEO Ferox got taken down. Anyone know if this is legit or just rumors? The market is going crazy right now.",
             "faction": "General", 
             "image": "https://images.unsplash.com/photo-1560179707-f14e90ef3623?q=80&w=400",
             "replies": [
@@ -188,7 +212,9 @@ if "posts" not in st.session_state:
             "content": "NASA has just published high-res imagery from the latest lunar orbiter. The clarity of the south pole craters is unprecedented.",
             "faction": "General", 
             "image": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=400",
-            "replies": []
+            "replies": [
+                {"author": "StarGazer", "text": "The resolution is insane. Look at those shadows!"}
+            ]
         },
         {
             "id": 104,
@@ -204,8 +230,8 @@ if "posts" not in st.session_state:
 if "view_mode" not in st.session_state:
     st.session_state.view_mode = "board" # board, detail, transmit
 
-if "selected_post" not in st.session_state:
-    st.session_state.selected_post = None
+if "selected_post_index" not in st.session_state:
+    st.session_state.selected_post_index = None
 
 if "current_filter" not in st.session_state:
     st.session_state.current_filter = "All"
@@ -216,7 +242,6 @@ with header_col1:
     st.markdown('<div class="brand-container"><div class="brand-title">KNOT-<span>LINK</span></div></div>', unsafe_allow_html=True)
 
 with header_col2:
-    # Use actual Streamlit buttons for navigation to handle state changes
     nav_cols = st.columns([1, 1, 1, 1])
     with nav_cols[1]:
         if st.button("NOTIFICATIONS", use_container_width=True):
@@ -225,16 +250,16 @@ with header_col2:
         is_board = st.session_state.view_mode == "board"
         if st.button("INTEL BOARD", type="primary" if is_board else "secondary", use_container_width=True):
             st.session_state.view_mode = "board"
-            st.session_state.selected_post = None
+            st.session_state.selected_post_index = None
             st.rerun()
     with nav_cols[3]:
         is_transmit = st.session_state.view_mode == "transmit"
         if st.button("TRANSMIT 📡", type="primary" if is_transmit else "secondary", use_container_width=True):
             st.session_state.view_mode = "transmit"
-            st.session_state.selected_post = None
+            st.session_state.selected_post_index = None
             st.rerun()
 
-# --- SIDEBAR (Persistent Info) ---
+# --- SIDEBAR ---
 with st.sidebar:
     st.markdown("### 🛰️ ACCESS")
     st.markdown(f"**Logon Status:** <span style='color:#E2FF00;'>Anonymous User</span>", unsafe_allow_html=True)
@@ -246,11 +271,9 @@ with st.sidebar:
 
 # --- MAIN CONTENT LOGIC ---
 
-# 1. TRANSMIT MODE (NEW FUNCTION)
+# 1. TRANSMIT MODE
 if st.session_state.view_mode == "transmit":
     st.markdown("## 📡 TRANSMIT NEW SIGNAL")
-    st.markdown("Broadcast your findings to the network. Use clear titles for better visibility.")
-    
     with st.container():
         st.markdown('<div class="transmit-panel">', unsafe_allow_html=True)
         with st.form("main_transmit_form", clear_on_submit=True):
@@ -275,46 +298,72 @@ if st.session_state.view_mode == "transmit":
                     }
                     st.session_state.posts.insert(0, new_post)
                     st.session_state.view_mode = "board"
-                    st.success("Signal broadcasted successfully!")
                     st.rerun()
-                else:
-                    st.error("Signal requires both a name and content.")
         st.markdown('</div>', unsafe_allow_html=True)
     
     if st.button("Cancel & Return"):
         st.session_state.view_mode = "board"
         st.rerun()
 
-# 2. DETAIL MODE
-elif st.session_state.view_mode == "detail" and st.session_state.selected_post:
-    post = st.session_state.selected_post
+# 2. DETAIL MODE (GUI VIEW BASED ON PHOTO)
+elif st.session_state.view_mode == "detail" and st.session_state.selected_post_index is not None:
+    post_idx = st.session_state.selected_post_index
+    post = st.session_state.posts[post_idx]
+    
     if st.button("← RETURN TO BOARD"):
         st.session_state.view_mode = "board"
-        st.session_state.selected_post = None
+        st.session_state.selected_post_index = None
         st.rerun()
     
-    st.markdown(f"### {post.get('title')}")
-    detail_img_col, detail_text_col = st.columns([1, 1.2])
+    # Detail GUI Wrapper
+    st.markdown('<div class="detail-container">', unsafe_allow_html=True)
     
-    with detail_img_col:
-        st.image(post.get('image', ""), use_container_width=True)
+    # Header Tag
+    st.markdown(f'<div class="detail-header-tag">{post["faction"].upper()}</div>', unsafe_allow_html=True)
     
-    with detail_text_col:
-        st.markdown(f"**Posted by:** `{post.get('author')}`")
-        st.info(post.get('content'))
+    col_left, col_right = st.columns([1.2, 1])
+    
+    with col_left:
+        st.markdown(f"### {post['title']}")
+        st.image(post['image'], use_container_width=True)
+        st.markdown(f"""
+            <div style="background:#111; padding:20px; border-radius:15px; border:1px solid #222; margin-top:10px;">
+                <p style="color:#E2FF00; font-size:12px; margin-bottom:5px;">REPORT BY: {post['author']}</p>
+                <p style="font-size:15px; line-height:1.6;">{post['content']}</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    with col_right:
+        st.markdown("#### COMMUNITY LOGS")
+        
+        # Scrollable replies area
+        reply_area = st.container(height=400)
+        with reply_area:
+            if not post['replies']:
+                st.caption("No signals intercepted in this thread yet...")
+            for r in post['replies']:
+                st.markdown(f"""
+                    <div class="detail-comment-box">
+                        <span style="color:#E2FF00; font-weight:800; font-size:11px;">@ {r['author']}</span>
+                        <p style="margin-top:5px; font-size:13px; color:#ddd;">{r['text']}</p>
+                    </div>
+                """, unsafe_allow_html=True)
+        
+        # Reply function
         st.write("---")
-        st.markdown("**COMMUNITY LOGS**")
-        if not post.get('replies'):
-            st.write("*No logs found on this frequency.*")
-        for i, r in enumerate(post.get('replies', [])):
-            st.markdown(f"""
-                <div class="detail-comment-box">
-                    <div style="font-size:10px; color:#E2FF00; margin-bottom:5px;">{i+1}F // {r.get('author')}</div>
-                    <div style="font-size:13px;">{r.get('text')}</div>
-                </div>
-            """, unsafe_allow_html=True)
+        with st.form(key=f"reply_form_{post['id']}", clear_on_submit=True):
+            reply_text = st.text_input("Enter response...", placeholder="Type your signal here...")
+            if st.form_submit_button("SUBMIT LOG", use_container_width=True):
+                if reply_text.strip():
+                    st.session_state.posts[post_idx]['replies'].append({
+                        "author": "Anonymous User",
+                        "text": reply_text
+                    })
+                    st.rerun()
 
-# 3. BOARD MODE (GRID VIEW)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# 3. BOARD MODE
 else:
     # FILTER TABS
     f_col1, f_col2, f_col3, f_col4 = st.columns([0.6, 0.8, 1, 5.6])
@@ -329,32 +378,32 @@ else:
 
     st.write("") 
 
-    display_posts = st.session_state.posts
+    display_posts_with_idx = [(i, p) for i, p in enumerate(st.session_state.posts)]
     if st.session_state.current_filter != "All":
-        display_posts = [p for p in st.session_state.posts if p.get('faction') == st.session_state.current_filter]
+        display_posts_with_idx = [(i, p) for i, p in enumerate(st.session_state.posts) if p['faction'] == st.session_state.current_filter]
 
-    if display_posts:
-        rows = [display_posts[i:i + 4] for i in range(0, len(display_posts), 4)]
+    if display_posts_with_idx:
+        rows = [display_posts_with_idx[i:i + 4] for i in range(0, len(display_posts_with_idx), 4)]
         for row in rows:
             cols = st.columns(4)
-            for idx, post in enumerate(row):
-                with cols[idx]:
+            for col_idx, (original_idx, post) in enumerate(row):
+                with cols[col_idx]:
                     card_html = f"""
                         <div class="card-container">
-                            <div class="card-image-box" style="background-image: url('{post.get('image')}');">
+                            <div class="card-image-box" style="background-image: url('{post['image']}');">
                                 <div class="card-overlay">
-                                    <div class="post-title">{post.get('title')}</div>
-                                    <div class="post-content-preview">{post.get('content')}</div>
+                                    <div class="post-title">{post['title']}</div>
+                                    <div class="post-content-preview">{post['content']}</div>
                                 </div>
                             </div>
                             <div class="card-footer">
                                 <div class="author-avatar">⚡</div>
-                                <div class="author-name">{post.get('author')}</div>
+                                <div class="author-name">{post['author']}</div>
                             </div>
                         </div>
                     """
-                    if st.button(f"READ SIGNAL #{post.get('id')}", key=f"btn_{post.get('id')}", use_container_width=True):
-                        st.session_state.selected_post = post
+                    if st.button(f"READ SIGNAL #{post['id']}", key=f"btn_{post['id']}", use_container_width=True):
+                        st.session_state.selected_post_index = original_idx
                         st.session_state.view_mode = "detail"
                         st.rerun()
                     
