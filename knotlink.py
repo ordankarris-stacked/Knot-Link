@@ -169,13 +169,7 @@ st.markdown("""
         border-radius: 0 10px 10px 0;
     }
 
-    /* Filter Tabs styling fix */
-    .filter-btn-container {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-
+    /* Sidebar Styling */
     section[data-testid="stSidebar"] {
         background-color: #0A0A0A !important;
         border-right: 1px solid #222;
@@ -245,11 +239,11 @@ with header_col1:
     st.markdown('<div class="brand-container"><div class="brand-title">KNOT-<span>LINK</span></div></div>', unsafe_allow_html=True)
 
 with header_col2:
+    # Removed "Schedule" button from the navigation container
     st.markdown("""
         <div class="nav-container">
             <div class="nav-btn">Notifications</div>
             <div class="nav-btn nav-btn-active">Intel Board</div>
-            <div class="nav-btn">Schedule</div>
         </div>
     """, unsafe_allow_html=True)
 
@@ -327,7 +321,6 @@ else:
             cols = st.columns(4)
             for idx, post in enumerate(row):
                 with cols[idx]:
-                    # Create the visual card inside the button to make the whole card clickable
                     card_html = f"""
                         <div class="card-container">
                             <div class="card-image-box" style="background-image: url('{post.get('image')}');">
@@ -342,10 +335,8 @@ else:
                             </div>
                         </div>
                     """
-                    # We wrap the UI in a button. By CSS we hide the button borders so it looks like a card.
                     if st.button("", key=f"card_btn_{post.get('id')}", use_container_width=True):
                         st.session_state.selected_post = post
                         st.rerun()
                     
-                    # Overlay the HTML visually at the same position
                     st.markdown(f'<div style="margin-top:-60px; pointer-events:none;">{card_html}</div>', unsafe_allow_html=True)
