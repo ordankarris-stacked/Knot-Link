@@ -42,13 +42,22 @@ st.markdown("""
         color: #E2FF00;
     }
 
-    /* Top Navigation Bar Styling */
-    .nav-container {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        padding: 10px 0;
-        gap: 10px;
+    /* Notification Dot Styling */
+    .nav-btn-container {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+    .notification-dot {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        height: 10px;
+        width: 10px;
+        background-color: #FF003C;
+        border-radius: 50%;
+        border: 2px solid #000;
+        z-index: 10;
     }
 
     /* Card Styling */
@@ -227,8 +236,11 @@ if "posts" not in st.session_state:
         }
     ]
 
+if "notifications" not in st.session_state:
+    st.session_state.notifications = []
+
 if "view_mode" not in st.session_state:
-    st.session_state.view_mode = "board" # board, detail, transmit
+    st.session_state.view_mode = "board" # board, detail, transmit, notify
 
 if "selected_post_index" not in st.session_state:
     st.session_state.selected_post_index = None
@@ -243,9 +255,21 @@ with header_col1:
 
 with header_col2:
     nav_cols = st.columns([1, 1, 1, 1])
+    
+    # Notifications Button with Red Dot logic
     with nav_cols[1]:
-        if st.button("NOTIFICATIONS", use_container_width=True):
-            st.toast("Accessing encrypted notifications...")
+        has_notifs = len(st.session_state.notifications) > 0
+        is_notify = st.session_state.view_mode == "notify"
+        
+        # We wrap the button in a div to place the red dot absolutely
+        dot_html = '<div class="notification-dot"></div>' if has_notifs else ''
+        st.markdown(f'<div class="nav-btn-container">{dot_html}', unsafe_allow_html=True)
+        if st.button("NOTIFICATIONS", use_container_width=True, type="primary" if is_notify else "secondary"):
+            st.session_state.view_mode = "notify"
+            st.session_state.selected_post_index = None
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+        
     with nav_cols[2]:
         is_board = st.session_state.view_mode == "board"
         if st.button("INTEL BOARD", type="primary" if is_board else "secondary", use_container_width=True):
@@ -271,8 +295,32 @@ with st.sidebar:
 
 # --- MAIN CONTENT LOGIC ---
 
+# 0. NOTIFICATIONS VIEW
+if st.session_state.view_mode == "notify":
+    st.markdown("## 🔔 SIGNAL INTERCEPTS")
+    if not st.session_state.notifications:
+        st.info("No new signal intercepts found. Your connection is silent.")
+        if st.button("Return to Board"):
+            st.session_state.view_mode = "board"
+            st.rerun()
+    else:
+        st.markdown("Recent activity on your transmissions:")
+        for i, note in enumerate(reversed(st.session_state.notifications)):
+            with st.container():
+                st.markdown(f"""
+                    <div class="detail-comment-box" style="border-left-color:#FF003C;">
+                        <span style="color:#FF003C; font-weight:800; font-size:11px;">NEW REPLY</span>
+                        <p style="margin-top:5px; font-size:14px; color:#fff;"><b>@{note['from']}</b> replied to <i>"{note['post_title']}"</i></p>
+                        <p style="font-size:12px; color:#aaa; font-style:italic;">"{note['text'][:50]}..."</p>
+                    </div>
+                """, unsafe_allow_html=True)
+        
+        if st.button("CLEAR ALL INTERCEPTS"):
+            st.session_state.notifications = []
+            st.rerun()
+
 # 1. TRANSMIT MODE
-if st.session_state.view_mode == "transmit":
+elif st.session_state.view_mode == "transmit":
     st.markdown("## 📡 TRANSMIT NEW SIGNAL")
     with st.container():
         st.markdown('<div class="transmit-panel">', unsafe_allow_html=True)
@@ -289,7 +337,7 @@ if st.session_state.view_mode == "transmit":
                 if t_name.strip() and t_body.strip():
                     new_post = {
                         "id": random.randint(1000, 9999),
-                        "author": "Anonymous User",
+                        "author": "Anonymous User", # In this app context, user is always "Anonymous User"
                         "title": t_name,
                         "content": t_body,
                         "faction": t_freq,
@@ -305,7 +353,7 @@ if st.session_state.view_mode == "transmit":
         st.session_state.view_mode = "board"
         st.rerun()
 
-# 2. DETAIL MODE (GUI VIEW BASED ON PHOTO)
+# 2. DETAIL MODE
 elif st.session_state.view_mode == "detail" and st.session_state.selected_post_index is not None:
     post_idx = st.session_state.selected_post_index
     post = st.session_state.posts[post_idx]
@@ -317,8 +365,6 @@ elif st.session_state.view_mode == "detail" and st.session_state.selected_post_i
     
     # Detail GUI Wrapper
     st.markdown('<div class="detail-container">', unsafe_allow_html=True)
-    
-    # Header Tag
     st.markdown(f'<div class="detail-header-tag">{post["faction"].upper()}</div>', unsafe_allow_html=True)
     
     col_left, col_right = st.columns([1.2, 1])
@@ -335,8 +381,6 @@ elif st.session_state.view_mode == "detail" and st.session_state.selected_post_i
         
     with col_right:
         st.markdown("#### COMMUNITY LOGS")
-        
-        # Scrollable replies area
         reply_area = st.container(height=400)
         with reply_area:
             if not post['replies']:
@@ -349,14 +393,22 @@ elif st.session_state.view_mode == "detail" and st.session_state.selected_post_i
                     </div>
                 """, unsafe_allow_html=True)
         
-        # Reply function
         st.write("---")
         with st.form(key=f"reply_form_{post['id']}", clear_on_submit=True):
             reply_text = st.text_input("Enter response...", placeholder="Type your signal here...")
             if st.form_submit_button("SUBMIT LOG", use_container_width=True):
                 if reply_text.strip():
+                    # Logic: If the post is by "Anonymous User", send a notification
+                    if post['author'] == "Anonymous User":
+                        st.session_state.notifications.append({
+                            "from": "Network Proxy",
+                            "post_title": post['title'],
+                            "text": reply_text,
+                            "timestamp": datetime.now()
+                        })
+                    
                     st.session_state.posts[post_idx]['replies'].append({
-                        "author": "Anonymous User",
+                        "author": "Network Proxy",
                         "text": reply_text
                     })
                     st.rerun()
