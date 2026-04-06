@@ -263,14 +263,16 @@ st.write("")
 # --- SIDEBAR ---
 with st.sidebar:
     st.markdown("### 🛰️ ACCESS")
-    st.markdown(f"**Login:** <span style='color:#E2FF00;'>Anonymous User</span>", unsafe_allow_html=True)
+    # Updated to 'Login Status: Anonymous User'
+    st.markdown(f"**Login Status:** <span style='color:#E2FF00;'>Anonymous User</span>", unsafe_allow_html=True)
     st.write("---")
     
-    # Restored Send Signal Functionality
+    # Restored "Send Signal" Functionality
     st.markdown("### 📡 TRANSMISSION")
     new_title = st.text_input("Signal Title", placeholder="e.g. [Alert] News...")
     new_content = st.text_area("Signal Body", placeholder="Broadcast a message...")
     post_category = st.selectbox("Frequency", ["General", "Help Info"])
+    
     if st.button("SEND SIGNAL", use_container_width=True, type="primary"):
         if new_content.strip() and new_title.strip():
             st.session_state.posts.insert(0, {
@@ -337,6 +339,7 @@ else:
                             </div>
                         </div>
                     """
+                    # Make card clickable
                     if st.button("", key=f"card_btn_{post.get('id')}", use_container_width=True):
                         st.session_state.selected_post = post
                         st.rerun()
