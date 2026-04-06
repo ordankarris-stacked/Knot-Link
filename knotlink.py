@@ -234,13 +234,11 @@ with header_col2:
         <div class="nav-container">
             <div class="nav-btn">NOTIFICATIONS</div>
             <div class="nav-btn nav-btn-active">INTEL BOARD</div>
-            <div class="nav-btn">SCHEDULE</div>
         </div>
     """, unsafe_allow_html=True)
 
 # --- FILTER TABS ---
 f_col1, f_col2, f_col3, f_col4 = st.columns([0.6, 0.8, 1, 5.6])
-# "Fairy Picks" removed from filters
 filters = ["All", "General", "Help Info"]
 
 for idx, f_name in enumerate(filters):
@@ -263,7 +261,6 @@ with st.sidebar:
     st.markdown("### 📡 BROADCAST")
     new_title = st.text_input("Signal Title", placeholder="e.g. [Question] Leveling up...")
     new_content = st.text_area("Signal Body", placeholder="Broadcast a message...")
-    # "Fairy Picks" removed from selectbox
     post_category = st.selectbox("Frequency", ["General", "Help Info"])
     
     if st.button("SEND SIGNAL", use_container_width=True, type="primary"):
