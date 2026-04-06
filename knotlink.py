@@ -263,7 +263,7 @@ st.write("")
 # --- SIDEBAR ---
 with st.sidebar:
     st.markdown("### 🛰️ ACCESS")
-    # Updated to 'Login Status: Anonymous User'
+    # Restore the 20:00 version of sidebar status and functions
     st.markdown(f"**Login Status:** <span style='color:#E2FF00;'>Anonymous User</span>", unsafe_allow_html=True)
     st.write("---")
     
