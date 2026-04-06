@@ -24,8 +24,16 @@ st.markdown("""
     /* Branding Header */
     .brand-container {
         display: flex;
-        align-items: center;
+        flex-direction: column;
         padding: 10px 0;
+    }
+    .lore-label {
+        font-size: 10px;
+        color: #E2FF00;
+        letter-spacing: 2px;
+        font-weight: 700;
+        margin-bottom: -5px;
+        opacity: 0.8;
     }
     .brand-title {
         font-size: 32px;
@@ -266,7 +274,7 @@ if "filter_category" not in st.session_state:
 # --- HEADER ---
 h_col1, h_col2 = st.columns([1, 1])
 with h_col1:
-    st.markdown('<div class="brand-container"><div class="brand-title">KNOT-<span>LINK</span></div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="brand-container"><div class="lore-label">PROXY\'S NETWORK</div><div class="brand-title">KNOT-<span>LINK</span></div></div>', unsafe_allow_html=True)
 with h_col2:
     n_cols = st.columns([1, 1, 1])
     with n_cols[0]:
