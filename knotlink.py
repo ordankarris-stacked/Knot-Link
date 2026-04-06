@@ -51,33 +51,7 @@ st.markdown("""
         gap: 10px;
     }
 
-    .nav-btn {
-        background-color: #333333;
-        color: #FFFFFF;
-        padding: 10px 25px;
-        border-radius: 30px;
-        font-weight: 700;
-        font-size: 14px;
-        text-transform: uppercase;
-        cursor: pointer;
-        border: none;
-        white-space: nowrap;
-    }
-
-    .nav-btn-active {
-        background-color: #E2FF00;
-        color: #000000 !important;
-    }
-
-    /* Clickable Card Styling */
-    .stButton > button[kind="secondaryFormSubmit"], .stButton > button[kind="secondary"] {
-        border: none !important;
-        background: transparent !important;
-        padding: 0 !important;
-        width: 100% !important;
-        transition: none !important;
-    }
-
+    /* Card Styling */
     .card-container {
         background-color: #111111;
         border-radius: 20px;
@@ -160,6 +134,15 @@ st.markdown("""
         color: #FFF;
     }
 
+    /* Transmission Form Panel */
+    .transmit-panel {
+        background: #111;
+        border: 2px solid #E2FF00;
+        padding: 30px;
+        border-radius: 20px;
+        margin-top: 20px;
+    }
+
     /* Detail View Styling */
     .detail-comment-box {
         background: #111;
@@ -218,6 +201,9 @@ if "posts" not in st.session_state:
         }
     ]
 
+if "view_mode" not in st.session_state:
+    st.session_state.view_mode = "board" # board, detail, transmit
+
 if "selected_post" not in st.session_state:
     st.session_state.selected_post = None
 
@@ -225,67 +211,85 @@ if "current_filter" not in st.session_state:
     st.session_state.current_filter = "All"
 
 # --- TOP HEADER ---
-header_col1, header_col2 = st.columns([1, 2])
+header_col1, header_col2 = st.columns([1, 2.5])
 with header_col1:
     st.markdown('<div class="brand-container"><div class="brand-title">KNOT-<span>LINK</span></div></div>', unsafe_allow_html=True)
 
 with header_col2:
-    st.markdown("""
-        <div class="nav-container">
-            <div class="nav-btn">NOTIFICATIONS</div>
-            <div class="nav-btn nav-btn-active">INTEL BOARD</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-# --- FILTER TABS ---
-f_col1, f_col2, f_col3, f_col4 = st.columns([0.6, 0.8, 1, 5.6])
-filters = ["All", "General", "Help Info"]
-
-for idx, f_name in enumerate(filters):
-    with [f_col1, f_col2, f_col3][idx]:
-        is_active = st.session_state.current_filter == f_name
-        if st.button(f_name, key=f"tab_filter_{f_name}", type="primary" if is_active else "secondary", use_container_width=True):
-            st.session_state.current_filter = f_name
+    # Use actual Streamlit buttons for navigation to handle state changes
+    nav_cols = st.columns([1, 1, 1, 1])
+    with nav_cols[1]:
+        if st.button("NOTIFICATIONS", use_container_width=True):
+            st.toast("Accessing encrypted notifications...")
+    with nav_cols[2]:
+        is_board = st.session_state.view_mode == "board"
+        if st.button("INTEL BOARD", type="primary" if is_board else "secondary", use_container_width=True):
+            st.session_state.view_mode = "board"
+            st.session_state.selected_post = None
+            st.rerun()
+    with nav_cols[3]:
+        is_transmit = st.session_state.view_mode == "transmit"
+        if st.button("TRANSMIT 📡", type="primary" if is_transmit else "secondary", use_container_width=True):
+            st.session_state.view_mode = "transmit"
             st.session_state.selected_post = None
             st.rerun()
 
-st.write("") 
-
-# --- SIDEBAR ---
+# --- SIDEBAR (Persistent Info) ---
 with st.sidebar:
     st.markdown("### 🛰️ ACCESS")
     st.markdown(f"**Logon Status:** <span style='color:#E2FF00;'>Anonymous User</span>", unsafe_allow_html=True)
     st.write("---")
-    
-    # "Send Signal" Functionality
-    st.markdown("### 📡 SEND SIGNAL")
-    with st.form("signal_form", clear_on_submit=True):
-        new_title = st.text_input("Signal Name", placeholder="Enter signal title...")
-        new_content = st.text_area("Content", placeholder="Broadcast your message...")
-        post_category = st.selectbox("Frequency", ["General", "Help Info"])
-        
-        submitted = st.form_submit_button("SEND SIGNAL", use_container_width=True)
-        if submitted:
-            if new_title.strip() and new_content.strip():
-                new_post = {
-                    "id": random.randint(1000, 9999),
-                    "author": "Anonymous User",
-                    "title": new_title,
-                    "content": new_content,
-                    "faction": post_category,
-                    "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400",
-                    "replies": []
-                }
-                st.session_state.posts.insert(0, new_post)
-                st.session_state.selected_post = None
-                st.rerun()
-            else:
-                st.error("Signal requires a title and content.")
+    st.markdown("### 📊 NETWORK STATS")
+    st.caption("Active Proxies: 12,402")
+    st.caption("Latency: 24ms")
+    st.caption("Signal Strength: High")
 
-# --- MAIN CONTENT ---
-if st.session_state.selected_post:
+# --- MAIN CONTENT LOGIC ---
+
+# 1. TRANSMIT MODE (NEW FUNCTION)
+if st.session_state.view_mode == "transmit":
+    st.markdown("## 📡 TRANSMIT NEW SIGNAL")
+    st.markdown("Broadcast your findings to the network. Use clear titles for better visibility.")
+    
+    with st.container():
+        st.markdown('<div class="transmit-panel">', unsafe_allow_html=True)
+        with st.form("main_transmit_form", clear_on_submit=True):
+            t_name = st.text_input("SIGNAL NAME", placeholder="e.g. [Alert] Unusual activity in Sector 6")
+            t_freq = st.selectbox("FREQUENCY", ["General", "Help Info"])
+            t_body = st.text_area("CONTENT", placeholder="Enter the detailed report here...", height=200)
+            
+            t_col1, t_col2 = st.columns([1, 4])
+            with t_col1:
+                t_submit = st.form_submit_button("INITIATE BROADCAST", use_container_width=True, type="primary")
+            
+            if t_submit:
+                if t_name.strip() and t_body.strip():
+                    new_post = {
+                        "id": random.randint(1000, 9999),
+                        "author": "Anonymous User",
+                        "title": t_name,
+                        "content": t_body,
+                        "faction": t_freq,
+                        "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400",
+                        "replies": []
+                    }
+                    st.session_state.posts.insert(0, new_post)
+                    st.session_state.view_mode = "board"
+                    st.success("Signal broadcasted successfully!")
+                    st.rerun()
+                else:
+                    st.error("Signal requires both a name and content.")
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    if st.button("Cancel & Return"):
+        st.session_state.view_mode = "board"
+        st.rerun()
+
+# 2. DETAIL MODE
+elif st.session_state.view_mode == "detail" and st.session_state.selected_post:
     post = st.session_state.selected_post
     if st.button("← RETURN TO BOARD"):
+        st.session_state.view_mode = "board"
         st.session_state.selected_post = None
         st.rerun()
     
@@ -310,8 +314,21 @@ if st.session_state.selected_post:
                 </div>
             """, unsafe_allow_html=True)
 
+# 3. BOARD MODE (GRID VIEW)
 else:
-    # GRID VIEW
+    # FILTER TABS
+    f_col1, f_col2, f_col3, f_col4 = st.columns([0.6, 0.8, 1, 5.6])
+    filters = ["All", "General", "Help Info"]
+
+    for idx, f_name in enumerate(filters):
+        with [f_col1, f_col2, f_col3][idx]:
+            is_active = st.session_state.current_filter == f_name
+            if st.button(f_name, key=f"tab_filter_{f_name}", type="primary" if is_active else "secondary", use_container_width=True):
+                st.session_state.current_filter = f_name
+                st.rerun()
+
+    st.write("") 
+
     display_posts = st.session_state.posts
     if st.session_state.current_filter != "All":
         display_posts = [p for p in st.session_state.posts if p.get('faction') == st.session_state.current_filter]
@@ -336,9 +353,9 @@ else:
                             </div>
                         </div>
                     """
-                    # Use unique key for each button to avoid streamlit ID collisions
                     if st.button(f"READ SIGNAL #{post.get('id')}", key=f"btn_{post.get('id')}", use_container_width=True):
                         st.session_state.selected_post = post
+                        st.session_state.view_mode = "detail"
                         st.rerun()
                     
                     st.markdown(f'<div style="margin-top:-60px; pointer-events:none;">{card_html}</div>', unsafe_allow_html=True)
