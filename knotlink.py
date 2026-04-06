@@ -265,7 +265,23 @@ with st.sidebar:
     st.markdown("### 🛰️ ACCESS")
     st.markdown(f"**Login:** <span style='color:#E2FF00;'>Anonymous User</span>", unsafe_allow_html=True)
     st.write("---")
-    # Transmission / Sending Signal section removed as requested
+    st.markdown("### 📡 TRANSMISSION")
+    new_title = st.text_input("Signal Title", placeholder="e.g. [Alert] News...")
+    new_content = st.text_area("Signal Body", placeholder="Broadcast a message...")
+    post_category = st.selectbox("Frequency", ["General", "Help Info"])
+    if st.button("SEND SIGNAL", use_container_width=True, type="primary"):
+        if new_content.strip() and new_title.strip():
+            st.session_state.posts.insert(0, {
+                "id": random.randint(1000, 9999),
+                "author": "Anonymous User",
+                "title": new_title,
+                "content": new_content,
+                "faction": post_category,
+                "image": "https://images.unsplash.com/photo-1516245834210-c4c142787335?q=80&w=400",
+                "replies": []
+            })
+            st.session_state.selected_post = None
+            st.rerun()
 
 # --- MAIN CONTENT ---
 if st.session_state.selected_post:
