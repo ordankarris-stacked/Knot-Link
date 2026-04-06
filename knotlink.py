@@ -264,7 +264,7 @@ with header_col2:
         # We wrap the button in a div to place the red dot absolutely
         dot_html = '<div class="notification-dot"></div>' if has_notifs else ''
         st.markdown(f'<div class="nav-btn-container">{dot_html}', unsafe_allow_html=True)
-        if st.button("NOTIFICATIONS", use_container_width=True, type="primary" if is_notify else "secondary"):
+        if st.button("NOTIFICATIONS", use_container_width=True, key="nav_notify", type="primary" if is_notify else "secondary"):
             st.session_state.view_mode = "notify"
             st.session_state.selected_post_index = None
             st.rerun()
@@ -272,13 +272,13 @@ with header_col2:
         
     with nav_cols[2]:
         is_board = st.session_state.view_mode == "board"
-        if st.button("INTEL BOARD", type="primary" if is_board else "secondary", use_container_width=True):
+        if st.button("INTEL BOARD", key="nav_board", type="primary" if is_board else "secondary", use_container_width=True):
             st.session_state.view_mode = "board"
             st.session_state.selected_post_index = None
             st.rerun()
     with nav_cols[3]:
         is_transmit = st.session_state.view_mode == "transmit"
-        if st.button("TRANSMIT 📡", type="primary" if is_transmit else "secondary", use_container_width=True):
+        if st.button("TRANSMIT 📡", key="nav_transmit", type="primary" if is_transmit else "secondary", use_container_width=True):
             st.session_state.view_mode = "transmit"
             st.session_state.selected_post_index = None
             st.rerun()
@@ -337,7 +337,7 @@ elif st.session_state.view_mode == "transmit":
                 if t_name.strip() and t_body.strip():
                     new_post = {
                         "id": random.randint(1000, 9999),
-                        "author": "Anonymous User", # In this app context, user is always "Anonymous User"
+                        "author": "Anonymous User", 
                         "title": t_name,
                         "content": t_body,
                         "faction": t_freq,
@@ -353,7 +353,7 @@ elif st.session_state.view_mode == "transmit":
         st.session_state.view_mode = "board"
         st.rerun()
 
-# 2. DETAIL MODE
+# 2. DETAIL MODE (The GUI where you can read and reply)
 elif st.session_state.view_mode == "detail" and st.session_state.selected_post_index is not None:
     post_idx = st.session_state.selected_post_index
     post = st.session_state.posts[post_idx]
@@ -394,11 +394,12 @@ elif st.session_state.view_mode == "detail" and st.session_state.selected_post_i
                 """, unsafe_allow_html=True)
         
         st.write("---")
+        # REPLY FUNCTION
         with st.form(key=f"reply_form_{post['id']}", clear_on_submit=True):
             reply_text = st.text_input("Enter response...", placeholder="Type your signal here...")
             if st.form_submit_button("SUBMIT LOG", use_container_width=True):
                 if reply_text.strip():
-                    # Logic: If the post is by "Anonymous User", send a notification
+                    # Check if this post belongs to the user to trigger a notification dot
                     if post['author'] == "Anonymous User":
                         st.session_state.notifications.append({
                             "from": "Network Proxy",
@@ -407,6 +408,7 @@ elif st.session_state.view_mode == "detail" and st.session_state.selected_post_i
                             "timestamp": datetime.now()
                         })
                     
+                    # Add reply to the thread
                     st.session_state.posts[post_idx]['replies'].append({
                         "author": "Network Proxy",
                         "text": reply_text
@@ -440,6 +442,7 @@ else:
             cols = st.columns(4)
             for col_idx, (original_idx, post) in enumerate(row):
                 with cols[col_idx]:
+                    # CARD UI
                     card_html = f"""
                         <div class="card-container">
                             <div class="card-image-box" style="background-image: url('{post['image']}');">
@@ -454,6 +457,7 @@ else:
                             </div>
                         </div>
                     """
+                    # THE "CLICK ON POST" FUNCTION
                     if st.button(f"READ SIGNAL #{post['id']}", key=f"btn_{post['id']}", use_container_width=True):
                         st.session_state.selected_post_index = original_idx
                         st.session_state.view_mode = "detail"
